@@ -1,7 +1,7 @@
 ---
 title: "Project 2"
 author: "Yasemin Deniz Sevilmis"
-date: "4/22/2020"
+date: "YYYY-MM-DD"
 output:
   html_document: default
   pdf_document: default
@@ -174,7 +174,7 @@ rand_dist[i]&lt;-mean(new[new$heartd== 1,]$chol)-
 
 #interpret
 mean(rand_dist&gt;8.856653 | rand_dist&lt; -8.856653)</code></pre>
-<pre><code>## [1] 0.1348</code></pre>
+<pre><code>## [1] 0.1354</code></pre>
 <pre class="r"><code>t.test(data=heart,chol~heartd)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
@@ -287,7 +287,7 @@ samp_distn&lt;-replicate(5000, {
 #bootstrap SEs
 samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
 <pre><code>##   (Intercept)       bp_c    maxHR_c bp_c:maxHR_c
-## 1   0.4624029 0.02480628 0.01967774  0.001150313</code></pre>
+## 1   0.4651665 0.02484196 0.01976454   0.00114234</code></pre>
 <pre class="r"><code>#compare
 coeftest(fit)[,1:2] #original</code></pre>
 <pre><code>##                  Estimate  Std. Error
