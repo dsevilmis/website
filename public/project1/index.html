@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Yasemin Deniz Sevilmis" />
+    <meta name="description" content="Welcome to my website.">
+    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <title>Project 1</title>
+    <meta name="generator" content="Hugo 0.70.0" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+        <li><a href="/resume/">RESUME</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="/project1/">Project 1</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          January 1, 0001
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+
+
+<p>###Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
+For my project, I have selected FiveThirtyEight’s ‘bechel’ dataset and the ‘movies’ dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes’ websites. The ‘bechdel’ df can be pulled up by downloading/calling the FiveThirtyEight package and the ‘movies’ dataset can be found here: <a href="http://www2.stat.duke.edu/~mc301/data/movies.html" class="uri">http://www2.stat.duke.edu/~mc301/data/movies.html</a>.</p>
+<p>####movies
+The ‘movies’ dataset is a dataframe that contains 651 randomly sampled movies released between 1972 and 2014 in the US and their IMDB and Rotten Tomatoes data. The variables include title, genre, runtime, year (released), director, imdb_id, studio, and mpaa rating(g, pg, pg-13, etc.), which are all pretty self explanatory. It also includes audience_score and critics_score (% positive ratings on Rotten Tomatoes) and the critics_rating (on the “Tomatometer”, which is either ‘Fresh’ or ‘Rotten’ or ‘Certified Fresh’). Fresh being positive critic ratings greater than 60%, Rotten being less than 60% positive critic reviews, and Certified Fresh is a special distinction for the very best rated movies. The audience_score is quite similar but it’s represented by a popcorn bucket, and upright means 60%+ positive reviews, and below is spilled. (thtr/dvd)<em>rel</em>(year/month/day) is the individual day, month, year it was released in theaters. The best_(pic/actor/actress/director)_(win/nom) refers to Oscars nominations and wins for best picture, director, actor, actress. The only caveat, these nominations and wins are not necessarily for that movie (except best picture), but for one of the main 5 actors or the director in their overall career. Actor1 through actor5 variables are just the main 5 lead actors featured in the movie. Top200_box is whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo.</p>
+<p>####bechdel
+The ‘bechdel’ dataset contains 1794 rows (movies) and 15 variables. <strong>The bechdel test is a measure of how well women are represented in a film. A movie passes the Bechdel test if there are (1) two named women in it, (2) who talk to each other, (3) about something besides a man.</strong> This is a standard for bare minimum of depth for female characters in a film. Year, title, imdb (ID) and budget are pretty self explanatory. The binary variable is just whether is passes or fails the test; test is the bechdel result with ‘ok’ if pass, or the reason why it didn’t pass, and if it says ‘-disagree’ there has been debate about whether that factor could be debated. The clean_test variable is the same as test but doesn’t include these discrepancies. Domgross and intgross are domestic and international gross in US dollars and the same variables with &quot;_2013&quot; at the end are just inflation-adjusted. The variables code, decade_code, and period_code are irrelevant and will be dropped.</p>
+<p>The data should be interesting to explore and see if the depth of female representation and interaction in movies has a positive or negative effect on the approval of critics, the public, or the profitability of the movie. I hope to find some kind of correlational evidence of movies that pass the Bechdel test performing better in the box office and ratings overall, disproving the belief that having females play a large role in films will hurt the profitability or approval, or possibly seeing which studios or genres are more likely to produce movies that pass the Bechdel test.</p>
+<pre class="r"><code>#Loading packages and datasets
+library(fivethirtyeight)
+library(tidyverse)
+library(cluster)
+library(knitr)
+library(kableExtra)
+bechdel&lt;-read.csv(&quot;https://raw.githubusercontent.com/fivethirtyeight/data/master/bechdel/movies.csv&quot;)
+load(&quot;/cloud/project/content/movies.Rdata&quot;)
+
+#Having a look at our data
+glimpse(bechdel)</code></pre>
+<pre><code>## Rows: 1,794
+## Columns: 15
+## $ year           &lt;int&gt; 2013, 2012, 2013, 2013, 2013, 2013, 2013, 2013, 2013, …
+## $ imdb           &lt;fct&gt; tt1711425, tt1343727, tt2024544, tt1272878, tt0453562,…
+## $ title          &lt;fct&gt; 21 &amp;amp; Over, Dredd 3D, 12 Years a Slave, 2 Guns, 42,…
+## $ test           &lt;fct&gt; notalk, ok-disagree, notalk-disagree, notalk, men, men…
+## $ clean_test     &lt;fct&gt; notalk, ok, notalk, notalk, men, men, notalk, ok, ok, …
+## $ binary         &lt;fct&gt; FAIL, PASS, FAIL, FAIL, FAIL, FAIL, FAIL, PASS, PASS, …
+## $ budget         &lt;int&gt; 13000000, 45000000, 20000000, 61000000, 40000000, 2250…
+## $ domgross       &lt;fct&gt; 25682380, 13414714, 53107035, 75612460, 95020213, 3836…
+## $ intgross       &lt;fct&gt; 42195766, 40868994, 158607035, 132493015, 95020213, 14…
+## $ code           &lt;fct&gt; 2013FAIL, 2012PASS, 2013FAIL, 2013FAIL, 2013FAIL, 2013…
+## $ budget_2013.   &lt;int&gt; 13000000, 45658735, 20000000, 61000000, 40000000, 2250…
+## $ domgross_2013. &lt;fct&gt; 25682380, 13611086, 53107035, 75612460, 95020213, 3836…
+## $ intgross_2013. &lt;fct&gt; 42195766, 41467257, 158607035, 132493015, 95020213, 14…
+## $ period.code    &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+## $ decade.code    &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …</code></pre>
+<pre class="r"><code>glimpse(movies)</code></pre>
+<pre><code>## Rows: 651
+## Columns: 32
+## $ title            &lt;chr&gt; &quot;Filly Brown&quot;, &quot;The Dish&quot;, &quot;Waiting for Guffman&quot;, &quot;T…
+## $ title_type       &lt;fct&gt; Feature Film, Feature Film, Feature Film, Feature Fi…
+## $ genre            &lt;fct&gt; Drama, Drama, Comedy, Drama, Horror, Documentary, Dr…
+## $ runtime          &lt;dbl&gt; 80, 101, 84, 139, 90, 78, 142, 93, 88, 119, 127, 108…
+## $ mpaa_rating      &lt;fct&gt; R, PG-13, R, PG, R, Unrated, PG-13, R, Unrated, Unra…
+## $ studio           &lt;fct&gt; Indomina Media Inc., Warner Bros. Pictures, Sony Pic…
+## $ thtr_rel_year    &lt;dbl&gt; 2013, 2001, 1996, 1993, 2004, 2009, 1986, 1996, 2012…
+## $ thtr_rel_month   &lt;dbl&gt; 4, 3, 8, 10, 9, 1, 1, 11, 9, 3, 6, 12, 1, 9, 6, 8, 3…
+## $ thtr_rel_day     &lt;dbl&gt; 19, 14, 21, 1, 10, 15, 1, 8, 7, 2, 19, 18, 4, 23, 20…
+## $ dvd_rel_year     &lt;dbl&gt; 2013, 2001, 2001, 2001, 2005, 2010, 2003, 2004, 2013…
+## $ dvd_rel_month    &lt;dbl&gt; 7, 8, 8, 11, 4, 4, 2, 3, 1, 8, 5, 9, 7, 2, 3, 12, 8,…
+## $ dvd_rel_day      &lt;dbl&gt; 30, 28, 21, 6, 19, 20, 18, 2, 21, 14, 1, 23, 9, 13, …
+## $ imdb_rating      &lt;dbl&gt; 5.5, 7.3, 7.6, 7.2, 5.1, 7.8, 7.2, 5.5, 7.5, 6.6, 6.…
+## $ imdb_num_votes   &lt;int&gt; 899, 12285, 22381, 35096, 2386, 333, 5016, 2272, 880…
+## $ critics_rating   &lt;fct&gt; Rotten, Certified Fresh, Certified Fresh, Certified …
+## $ critics_score    &lt;dbl&gt; 45, 96, 91, 80, 33, 91, 57, 17, 90, 83, 89, 67, 80, …
+## $ audience_rating  &lt;fct&gt; Upright, Upright, Upright, Upright, Spilled, Upright…
+## $ audience_score   &lt;dbl&gt; 73, 81, 91, 76, 27, 86, 76, 47, 89, 66, 75, 46, 89, …
+## $ best_pic_nom     &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no, no, no, …
+## $ best_pic_win     &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no, no, no, …
+## $ best_actor_win   &lt;fct&gt; no, no, no, yes, no, no, no, yes, no, no, yes, no, y…
+## $ best_actress_win &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, no, no, yes,…
+## $ best_dir_win     &lt;fct&gt; no, no, no, yes, no, no, no, no, no, no, no, no, no,…
+## $ top200_box       &lt;fct&gt; no, no, no, no, no, no, no, no, no, no, yes, no, no,…
+## $ director         &lt;chr&gt; &quot;Michael D. Olmos&quot;, &quot;Rob Sitch&quot;, &quot;Christopher Guest&quot;…
+## $ actor1           &lt;chr&gt; &quot;Gina Rodriguez&quot;, &quot;Sam Neill&quot;, &quot;Christopher Guest&quot;, …
+## $ actor2           &lt;chr&gt; &quot;Jenni Rivera&quot;, &quot;Kevin Harrington&quot;, &quot;Catherine O&#39;Har…
+## $ actor3           &lt;chr&gt; &quot;Lou Diamond Phillips&quot;, &quot;Patrick Warburton&quot;, &quot;Parker…
+## $ actor4           &lt;chr&gt; &quot;Emilio Rivera&quot;, &quot;Tom Long&quot;, &quot;Eugene Levy&quot;, &quot;Richard…
+## $ actor5           &lt;chr&gt; &quot;Joseph Julian Soria&quot;, &quot;Genevieve Mooy&quot;, &quot;Bob Balaba…
+## $ imdb_url         &lt;chr&gt; &quot;http://www.imdb.com/title/tt1869425/&quot;, &quot;http://www.…
+## $ rt_url           &lt;chr&gt; &quot;//www.rottentomatoes.com/m/filly_brown_2012/&quot;, &quot;//w…</code></pre>
+<p>##Tidying and Joining</p>
+<pre class="r"><code>#get imdb ID&#39;s
+imdb&lt;-gsub(&quot;http://www.imdb.com/title/&quot;, &quot;&quot;, movies$imdb_url)
+imdb&lt;-gsub(&quot;/&quot;, &quot;&quot;, imdb)
+movies$imdb &lt;- imdb
+movies%&gt;%select(title, imdb)%&gt;%glimpse()</code></pre>
+<pre><code>## Rows: 651
+## Columns: 2
+## $ title &lt;chr&gt; &quot;Filly Brown&quot;, &quot;The Dish&quot;, &quot;Waiting for Guffman&quot;, &quot;The Age of I…
+## $ imdb  &lt;chr&gt; &quot;tt1869425&quot;, &quot;tt0205873&quot;, &quot;tt0118111&quot;, &quot;tt0106226&quot;, &quot;tt0388230&quot;…</code></pre>
+<pre class="r"><code>#inner join
+bechdat&lt;-bechdel%&gt;%inner_join(movies, by = &#39;imdb&#39;)</code></pre>
+<p>First I had to change the variable imdb_url (starts with ‘tt’) to drop the link before and after it so I could join by imdb ID because joining by title caused problems and repeats. I chose an inner join because I only wanted movies present in both datasets because I wanted to be able to compare across multiple categories without N/A’s, I knew there would still be a lot of observations left over, even after dropping many movies. I also did this because there are so many variables, if a movie is missing in one set, there will be a lot of NA’s in the overall row. ____ cases were dropped total.</p>
+<pre class="r"><code>#dropping and renaming variable
+bechdat2&lt;-bechdat%&gt;%
+  select(-code, -rt_url, -imdb_url, -period.code, -decade.code, -test, -budget, -domgross, -intgross, -dvd_rel_year, -dvd_rel_month, -dvd_rel_day, -thtr_rel_month, -thtr_rel_day, -title.x)%&gt;%
+  rename(budget= budget_2013., domgross = domgross_2013., intgross = intgross_2013., title = title.y)</code></pre>
+<p>To clean up the table a bit and remove unnecessary variables, I dropped the variables code, rt_url, period.code, decade.code, dvd_rel_(year/month/day), thtr_rel_month/day for irrelevance. I dropped test because I am using clean_test for a more detailed/clear bechdel test result. We’re also dropping budget, domgross, intgross in exchange for the inflation adjusted &quot;_13&quot; versions, which we will rename to the former. When joining we had two variables named title, which became title.x and title.y, so I dropped .x and renamed it to just title.</p>
+<pre class="r"><code>bech1&lt;-bechdat2%&gt;%pivot_longer(cols = c(&#39;actor1&#39;:&#39;actor5&#39;), names_to = &#39;role&#39;, values_to = &#39;actors&#39;)%&gt;%
+  select(-role)
+bech1&lt;-bech1%&gt;% group_by(imdb)%&gt;%
+  mutate(lead_actors = paste(actors, collapse = &quot;, &quot;))%&gt;%
+  select(-actors)%&gt;%
+  distinct(lead_actors, .keep_all= TRUE)%&gt;%
+  ungroup()
+bech1%&gt;%select(imdb, title, lead_actors)</code></pre>
+<pre><code>## # A tibble: 129 x 3
+##    imdb     title               lead_actors                                     
+##    &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;                                           
+##  1 tt15351… Captain Phillips    Tom Hanks, Catherine Keener, Barkhad Abdi, Mich…
+##  2 tt16505… Kick-Ass 2          Aaron Taylor-Johnson, Christopher Mintz-Plasse,…
+##  3 tt18545… Percy Jackson: Sea… Logan Lerman, Brandon T. Jackson, Alexandra Dad…
+##  4 tt20053… The Frozen Ground   Nicolas Cage, John Cusack, Vanessa Hudgens, Dea…
+##  5 tt12454… This Is the End     James Franco, Jonah Hill, Danny McBride, Craig …
+##  6 tt23348… White House Down    Channing Tatum, Jamie Foxx, Maggie Gyllenhaal, …
+##  7 tt13711… Cloud Atlas         Tom Hanks, Halle Berry, Jim Broadbent, Hugo Wea…
+##  8 tt18537… Django Unchained    Jamie Foxx, Christoph Waltz, Leonardo DiCaprio,…
+##  9 tt21014… Spring Breakers     Selena Gomez, James Franco, Ashley Benson, Rach…
+## 10 tt13921… The Hunger Games    Jennifer Lawrence, Josh Hutcherson, Liam Hemswo…
+## # … with 119 more rows</code></pre>
+<p>There was a separate column for each lead actor, which I found unnecessary, so I combined all 5 into one observation under the variable lead_actors. Used pivot longer to combine all actors into one variable and be able to group by movie later. Used paste and collapse to form a string of values separated by a comma and space to list the top 5 actors per movie in a single row so there wasn’t duplicate data of every movie. We removed duplicate rows using the .keep_all function above.</p>
+<pre class="r"><code>#fix repeat studios
+bech1$studio&lt;- gsub(&quot;The Weinstein Company&quot;, &quot;The Weinstein Co.&quot;, bech1$studio)
+bech1$studio&lt;- gsub(&quot;Weinstein Company&quot;, &quot;The Weinstein Co.&quot;, bech1$studio)
+bech1$studio&lt;- gsub(&quot;Paramount Studios&quot;, &quot;Paramount Pictures&quot;, bech1$studio)
+bech1$studio&lt;- gsub(&quot;Warner Bros. Pictures&quot;, &quot;Warner Bros.&quot;, bech1$studio)
+
+bech1%&gt;%select(studio)%&gt;%glimpse()</code></pre>
+<pre><code>## Rows: 129
+## Columns: 1
+## $ studio &lt;chr&gt; &quot;Sony Pictures&quot;, &quot;Universal Pictures&quot;, &quot;20th Century Fox&quot;, &quot;Th…</code></pre>
+<p>Fixed as many of the repeat studios as I could using gsub.</p>
+<pre class="r"><code>#drop N/A, make ROI var
+bech1&lt;- bech1 %&gt;% mutate_at(c(&quot;domgross&quot;, &quot;intgross&quot;), function(x)as.numeric(as.character(x))) %&gt;%
+  filter(intgross != &quot;#N/A&quot;) %&gt;% na.omit %&gt;%mutate(ROI= (intgross/budget))
+bech1</code></pre>
+<pre><code>## # A tibble: 127 x 29
+##     year imdb  clean_test binary budget domgross intgross title title_type genre
+##    &lt;int&gt; &lt;chr&gt; &lt;fct&gt;      &lt;fct&gt;   &lt;int&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;fct&gt;      &lt;fct&gt;
+##  1  2013 tt15… notalk     FAIL   5.50e7   1.07e8   2.19e8 Capt… Feature F… Drama
+##  2  2013 tt16… ok         PASS   2.80e7   2.88e7   6.08e7 Kick… Feature F… Acti…
+##  3  2013 tt18… ok         PASS   9.00e7   6.86e7   2.01e8 Perc… Feature F… Drama
+##  4  2013 tt12… notalk     FAIL   3.20e7   1.01e8   1.26e8 This… Feature F… Drama
+##  5  2013 tt23… men        FAIL   1.50e8   7.31e7   2.05e8 Whit… Feature F… Drama
+##  6  2012 tt13… ok         PASS   1.03e8   2.75e7   1.28e8 Clou… Feature F… Drama
+##  7  2012 tt18… notalk     FAIL   1.01e8   1.65e8   4.32e8 Djan… Feature F… Other
+##  8  2012 tt21… ok         PASS   5.07e6   1.43e7   3.11e7 Spri… Feature F… Drama
+##  9  2012 tt13… ok         PASS   8.12e7   4.14e8   6.95e8 The … Feature F… Drama
+## 10  2011 tt17… nowomen    FAIL   5.18e6   1.83e7   2.75e7 Apol… Feature F… Scie…
+## # … with 117 more rows, and 19 more variables: runtime &lt;dbl&gt;,
+## #   mpaa_rating &lt;fct&gt;, studio &lt;chr&gt;, thtr_rel_year &lt;dbl&gt;, imdb_rating &lt;dbl&gt;,
+## #   imdb_num_votes &lt;int&gt;, critics_rating &lt;fct&gt;, critics_score &lt;dbl&gt;,
+## #   audience_rating &lt;fct&gt;, audience_score &lt;dbl&gt;, best_pic_nom &lt;fct&gt;,
+## #   best_pic_win &lt;fct&gt;, best_actor_win &lt;fct&gt;, best_actress_win &lt;fct&gt;,
+## #   best_dir_win &lt;fct&gt;, top200_box &lt;fct&gt;, director &lt;chr&gt;, lead_actors &lt;chr&gt;,
+## #   ROI &lt;dbl&gt;</code></pre>
+<p>Dropped a single movie with ‘#N/A’ for both intgross and domgross, then made a new variable called ROI (Return on Investment) using mutate() which indicates what percent of the initial investment(budget) is returned by movie’s gross profits (intgross). Also used na.omit() because there was only one movie (“London to Brighton”) that had NA for domgross.</p>
+<pre class="r"><code>bech1&lt;- bech1%&gt;%mutate(clean_test = str_replace_all(clean_test, 
+                                      &quot;ok&quot;,
+                                      &quot;Passes Bechdel Test&quot;),
+         clean_test = str_replace_all(clean_test, &quot;men&quot;,
+                                      &quot;Women Only Talk About Men&quot;),
+         clean_test = str_replace_all(clean_test, &quot;notalk&quot;,
+                                      &quot;Women Don&#39;t Talk To Each Other&quot;),
+         clean_test = str_replace_all(clean_test, &quot;nowoWomen Only Talk About Men&quot;,
+                                      &quot;Fewer Than Two Women&quot;),
+         clean_test = str_replace_all(clean_test, &quot;dubious&quot;,
+                                      &quot;Dubious&quot;))</code></pre>
+<p>Changed names of clean_test values to more accurately reflect what they mean, previous names were very unclear and hard to interpret.</p>
+<pre class="r"><code>#make century var
+bech1$century&lt;- ifelse(bech1$year &lt; 2000,&quot;Pre&quot;,&quot;Post&quot;)
+
+#change fctr to categ
+bech1&lt;-bech1 %&gt;% mutate_at(c(&quot;best_pic_nom&quot;, &quot;best_pic_win&quot;, &quot;best_actor_win&quot;, &quot;best_actress_win&quot;, &quot;best_dir_win&quot;, &quot;top200_box&quot;), function(x)as.character(as.factor(x)))
+
+#categorical to binary
+bech1&lt;- bech1%&gt;%mutate(best_pic_nom = if_else(best_pic_nom == &quot;yes&quot;, TRUE, FALSE), 
+               best_pic_win = if_else(best_pic_win == &quot;yes&quot;, TRUE, FALSE),
+               best_actor_win = if_else(best_actor_win == &quot;yes&quot;, TRUE, FALSE),
+               best_actress_win = if_else(best_actress_win == &quot;yes&quot;, TRUE, FALSE),
+               best_dir_win = if_else(best_dir_win == &quot;yes&quot;, TRUE, FALSE),
+               top200_box = if_else(top200_box == &quot;yes&quot;, TRUE, FALSE))
+bech1&lt;- bech1%&gt;%mutate(binary2 = if_else(binary == &quot;PASS&quot;, TRUE, FALSE))</code></pre>
+<p>Made century var to indicate if made before or after 2000, changed the factor variables to binary in order to easier compute summary statistics using mean() and sum() to get count and proportion.</p>
+<p>##Summary Statistics</p>
+<pre class="r"><code>#the very top rated movies and whether or not they passed
+sum1 &lt;- bech1%&gt;%select(title, audience_rating, critics_rating, top200_box, binary)%&gt;%filter(audience_rating == &quot;Upright&quot;, critics_rating == &quot;Certified Fresh&quot;, top200_box == TRUE)
+sum1%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+title
+</th>
+<th style="text-align:left;">
+audience_rating
+</th>
+<th style="text-align:left;">
+critics_rating
+</th>
+<th style="text-align:left;">
+top200_box
+</th>
+<th style="text-align:left;">
+binary
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+The Hunger Games
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+PASS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+The Hangover
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FAIL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Harry Potter and the Chamber of Secrets
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+PASS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Cast Away
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FAIL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Titanic
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+PASS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Aladdin
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FAIL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Beverly Hills Cop
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FAIL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Superman II
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+FAIL
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Grease
+</td>
+<td style="text-align:left;">
+Upright
+</td>
+<td style="text-align:left;">
+Certified Fresh
+</td>
+<td style="text-align:left;">
+TRUE
+</td>
+<td style="text-align:left;">
+PASS
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#paramount pics makes the most passing films
+sum2 &lt;- bech1%&gt;%group_by(studio)%&gt;%filter(binary == &quot;PASS&quot;)%&gt;%summarise(n_pass = n())%&gt;%arrange(desc(n_pass))
+sum2%&gt;%glimpse</code></pre>
+<pre><code>## Rows: 35
+## Columns: 2
+## $ studio &lt;chr&gt; &quot;Paramount Pictures&quot;, &quot;Universal Pictures&quot;, &quot;20th Century Fox&quot;…
+## $ n_pass &lt;int&gt; 8, 4, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…</code></pre>
+<pre class="r"><code>#mean, med, sd of critics score grouped by bechdel test indicators
+sum3 &lt;- bech1%&gt;%group_by(clean_test)%&gt;%
+  summarise(med_ROI = median(ROI), mean_critic = mean(critics_score), sd_critic = sd(critics_score))%&gt;%arrange(desc(med_ROI))
+sum3%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+clean_test
+</th>
+<th style="text-align:right;">
+med_ROI
+</th>
+<th style="text-align:right;">
+mean_critic
+</th>
+<th style="text-align:right;">
+sd_critic
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Fewer Than Two Women
+</td>
+<td style="text-align:right;">
+5.459309
+</td>
+<td style="text-align:right;">
+77.14286
+</td>
+<td style="text-align:right;">
+24.87588
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Women Only Talk About Men
+</td>
+<td style="text-align:right;">
+5.244376
+</td>
+<td style="text-align:right;">
+72.75000
+</td>
+<td style="text-align:right;">
+24.75379
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Dubious
+</td>
+<td style="text-align:right;">
+2.983381
+</td>
+<td style="text-align:right;">
+66.86667
+</td>
+<td style="text-align:right;">
+20.67389
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Passes Bechdel Test
+</td>
+<td style="text-align:right;">
+2.746332
+</td>
+<td style="text-align:right;">
+67.42857
+</td>
+<td style="text-align:right;">
+23.12799
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Women Don’t Talk To Each Other
+</td>
+<td style="text-align:right;">
+2.697400
+</td>
+<td style="text-align:right;">
+65.48649
+</td>
+<td style="text-align:right;">
+24.52054
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#greatest budgets go to movies where women don&#39;t talk to each other but they have the lowest median ROI
+sum4 &lt;- bech1%&gt;%group_by(binary, clean_test)%&gt;%
+  summarise(med_ROI = median(ROI), med_budget = median(budget), med_intgross = median(intgross))%&gt;%arrange(desc(med_ROI))
+sum4%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+binary
+</th>
+<th style="text-align:left;">
+clean_test
+</th>
+<th style="text-align:right;">
+med_ROI
+</th>
+<th style="text-align:right;">
+med_budget
+</th>
+<th style="text-align:right;">
+med_intgross
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Fewer Than Two Women
+</td>
+<td style="text-align:right;">
+5.459309
+</td>
+<td style="text-align:right;">
+17625825
+</td>
+<td style="text-align:right;">
+201487544
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Women Only Talk About Men
+</td>
+<td style="text-align:right;">
+5.244376
+</td>
+<td style="text-align:right;">
+15563006
+</td>
+<td style="text-align:right;">
+75018494
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Dubious
+</td>
+<td style="text-align:right;">
+2.983381
+</td>
+<td style="text-align:right;">
+46231854
+</td>
+<td style="text-align:right;">
+107125483
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PASS
+</td>
+<td style="text-align:left;">
+Passes Bechdel Test
+</td>
+<td style="text-align:right;">
+2.746332
+</td>
+<td style="text-align:right;">
+36473844
+</td>
+<td style="text-align:right;">
+70345821
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Women Don’t Talk To Each Other
+</td>
+<td style="text-align:right;">
+2.697400
+</td>
+<td style="text-align:right;">
+55000000
+</td>
+<td style="text-align:right;">
+124705810
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#most grammy wins are given to bechdel passing test
+sum5 &lt;- bech1%&gt;%group_by(binary, clean_test)%&gt;%summarise(sum(best_pic_nom), n_best_pic_win = sum(best_pic_win), sum(best_dir_win), sum(best_actor_win), sum(best_actress_win))%&gt;%arrange(desc(n_best_pic_win))%&gt;%select(binary, clean_test, n_best_pic_win, everything())
+sum5%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+binary
+</th>
+<th style="text-align:left;">
+clean_test
+</th>
+<th style="text-align:right;">
+n_best_pic_win
+</th>
+<th style="text-align:right;">
+sum(best_pic_nom)
+</th>
+<th style="text-align:right;">
+sum(best_dir_win)
+</th>
+<th style="text-align:right;">
+sum(best_actor_win)
+</th>
+<th style="text-align:right;">
+sum(best_actress_win)
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+PASS
+</td>
+<td style="text-align:left;">
+Passes Bechdel Test
+</td>
+<td style="text-align:right;">
+4
+</td>
+<td style="text-align:right;">
+7
+</td>
+<td style="text-align:right;">
+8
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+14
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Dubious
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+3
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Women Don’t Talk To Each Other
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+6
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Fewer Than Two Women
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FAIL
+</td>
+<td style="text-align:left;">
+Women Only Talk About Men
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#more pass test since 2000
+sum6 &lt;- bech1%&gt;%group_by(century)%&gt;%summarise(tot_pass = sum(binary2), n = n(), percent_pass = mean(binary2))%&gt;%arrange(desc(percent_pass))
+sum6%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+century
+</th>
+<th style="text-align:right;">
+tot_pass
+</th>
+<th style="text-align:right;">
+n
+</th>
+<th style="text-align:right;">
+percent_pass
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Post
+</td>
+<td style="text-align:right;">
+39
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+0.4588235
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pre
+</td>
+<td style="text-align:right;">
+17
+</td>
+<td style="text-align:right;">
+42
+</td>
+<td style="text-align:right;">
+0.4047619
+</td>
+</tr>
+</tbody>
+</table>
+<p>Summary 1- Out of the movies that scored the top ranking on IMDB for both critics and audience, and were in the top 200 box office, most actually failed the Bechdel test.
+Summary 2- Paramount Studios produces the most films passing the Bechdel test (may be a good place to go if you’re a woman in the film industry!).
+Summary 3- Across the different Bechdel Test requirements, movies that passed or failed (doesn’t matter why they failed) are not rated significantly different by critics. However, movies where there are less than 2 named women seemed to have the largest return on investment (this could possibly be due to a small budget given to these types of movies, or maybe a small budget means less actors &amp; actress a producer is able to hire).
+Summary 4- The greatest budgets go to movies where women don’t talk to each other but they also have the lowest median ROI- even if producers had women just talking to each other about a man, their ROI could shoot up to 5.24x ROI!
+Summary 5- The most Grammy wins across EVERY category goes to movies that PASS the Bechdel Test (woo!).
+Summary 6- A greater percent of movies produced in the 21st century pass the test as opposed to before - yay, progress.</p>
+<pre class="r"><code>#correlation matrix of most numeric variables
+bech_cor &lt;- bech1 %&gt;% select_if(is.numeric) %&gt;% select(-thtr_rel_year, -imdb_num_votes) %&gt;% na.omit %&gt;% cor()
+bech_cor</code></pre>
+<pre><code>##                       year      budget   domgross    intgross    runtime
+## year            1.00000000 -0.09064457 -0.3680710 -0.22785696 -0.1175514
+## budget         -0.09064457  1.00000000  0.5184256  0.61131509  0.3647877
+## domgross       -0.36807097  0.51842561  1.0000000  0.92926186  0.3704819
+## intgross       -0.22785696  0.61131509  0.9292619  1.00000000  0.3690085
+## runtime        -0.11755139  0.36478766  0.3704819  0.36900845  1.0000000
+## imdb_rating    -0.20559467 -0.17300644  0.1794903  0.12429683  0.3474642
+## critics_score  -0.20902102 -0.15618645  0.1939696  0.12871453  0.1925464
+## audience_score -0.27348845 -0.26084253  0.1462348  0.07108851  0.2360699
+## ROI            -0.11861473 -0.15738606  0.2518450  0.19872773 -0.1015787
+##                imdb_rating critics_score audience_score        ROI
+## year            -0.2055947    -0.2090210    -0.27348845 -0.1186147
+## budget          -0.1730064    -0.1561865    -0.26084253 -0.1573861
+## domgross         0.1794903     0.1939696     0.14623480  0.2518450
+## intgross         0.1242968     0.1287145     0.07108851  0.1987277
+## runtime          0.3474642     0.1925464     0.23606990 -0.1015787
+## imdb_rating      1.0000000     0.7555322     0.90368952  0.1878592
+## critics_score    0.7555322     1.0000000     0.71788639  0.2394272
+## audience_score   0.9036895     0.7178864     1.00000000  0.2215078
+## ROI              0.1878592     0.2394272     0.22150783  1.0000000</code></pre>
+<p>##Visualisations</p>
+<pre class="r"><code>#cor heatmap
+library(ggcorrplot)
+ggcorrplot(bech_cor, colors = c(&quot;steelblue1&quot;, &quot;white&quot;, &quot;deeppink&quot;))+labs(title = &quot;Bechdel Movie Data Correlations&quot;)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" />
+From our heatmap, we can see the darker pink areas have the greatest correlation. Off the bat, some of the darkest correlations are intgross~domgross, audience_score~imdb_rating, critics_score~imdb_rating, audience_score~critics_score, int_gross~budget, then it starts to get very weakly correlated. It makes sense that domestic and international gross are very highly correlated because intgross encompasses domgross, and usually if a film is very popular domestically, there is a good chance it will be internationally as well. The audience score, critics score, and IMDB score are all correlated with each other, probably because the audience is usually the one filling out IMDB scores on the site, and if they are reviewing on one site, it is likely they would review on another (Rotten Tomatoes &amp; IMDB). Additionally critics are technically audience too, so they probably have similar reviews to audience, but it is also possible that outside of formal, professional reviews, they could leave personal ones too. Finally, the international gross and budget being correlated makes sense because the more money you tend to put in a production, usually the better made it is, and the more well received it’ll be both domestically and abroad.</p>
+<pre class="r"><code>#ggplot1 with stat summary
+library(scales)
+bech1%&gt;%ggplot()+geom_bar(aes(x=genre, y= intgross, fill=genre), stat = &quot;summary&quot;, fun.y=&quot;mean&quot;)+
+  scale_fill_brewer(palette = &quot;PiYG&quot;, direction = -1)+
+  geom_errorbar(stat = &quot;summary&quot;, fun.data= mean_se, aes(x=genre, y=intgross), width=.5)+
+  theme(axis.ticks = element_blank(), axis.text.x = element_blank())+
+  coord_flip() +
+  scale_y_continuous(trans=log_trans(), name = &quot;Log(Mean International Gross) ($USD)&quot;)+ 
+  facet_wrap(~binary) +
+  labs(title = &quot;Mean International Gross (Scaled) by Bechdel Test Result &amp; Genre&quot;)+
+  theme(plot.title = element_text(hjust = .5))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" />
+Once scaled to account for extremely, internationally popular movies, we can see that not only is there very few real significant differences in international gross across movie genres in both movies that pass and fail the test (some that stick out as statistically different would be musicals as being statistically lower on average than comedy, mystery, drama, action), but potentially science fiction/fantasy movies do better when it passes the bechdel test. Otherwise, passing or failing the Bechdel test doesn’t really seem to hurt or help your international gross across genres.</p>
+<pre class="r"><code>#ggplot2
+
+bech1%&gt;%ggplot()+geom_bar(aes(x=critics_rating, fill=binary))+facet_wrap(~clean_test)+ scale_fill_manual(values = c(&quot;lightskyblue&quot;, &quot;pink&quot;)) +
+  labs(title = &quot;Rotten Tomatoes Critic Rating vs. Bechdel Test Results&quot;,
+       x = &quot;Rotten Tomatoes Critic Rating&quot;,
+       y = &quot;Number of Movies&quot;,
+       fill= &quot;Bechdel Test&quot;) +
+  theme(plot.title = element_text(hjust = .5))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" />
+In this one, we can see that there are many more movies that rate in the Certified Fresh and Fresh categories than any of the failing categories. Granted, there are greater numbers in the passing because the failing movies have been split up across categories, but even when put back together, there are 27/56 (48%) movies that pass and are Certified Fresh as compared to 33/71 (45%) movies that fail and are rated Certified Fresh, so the percent of movies that score higher by critics on Rotten Tomatoes is greater.</p>
+<pre class="r"><code>#ggplot3
+bech1%&gt;%ggplot()+geom_boxplot(aes(x=mpaa_rating, y=imdb_rating, fill=binary))+
+  facet_wrap(~binary)+scale_fill_brewer(palette = &quot;PiYG&quot;, direction = -1) +
+  labs(title = &quot;MPAA rating vs. IMDB rating&quot;,
+       subtitle = &quot;Grouped by Pass/Fail of Bechdel Test&quot;,
+       x = &quot;MPAA rating&quot;,
+       y = &quot;IMDB Rating (1-10 stars)&quot;) +
+  theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
+We can see that there is no significant difference in IMDB ratings across films that pass or fail the Bechdel test, and across MPAA ratings. It is interesting to note here, that there are no rated G movies that pass the Bechdel test. If we use MPAA rating as a proxy for target audience, it is interesting to see there are no real kids movies that truly represent women, which also suggests a lack of depth in role models for young girls- this is something that could be explored further.</p>
+<p>##Running Principal Component Analysis</p>
+<pre class="r"><code>#select all numeric variables and scale them
+bech_nums &lt;- bech1 %&gt;% select_if(is.numeric) %&gt;% scale()
+
+#examine covariance
+bech_nums%&gt;%cov</code></pre>
+<pre><code>##                       year      budget   domgross    intgross    runtime
+## year            1.00000000 -0.09064457 -0.3680710 -0.22785696 -0.1175514
+## budget         -0.09064457  1.00000000  0.5184256  0.61131509  0.3647877
+## domgross       -0.36807097  0.51842561  1.0000000  0.92926186  0.3704819
+## intgross       -0.22785696  0.61131509  0.9292619  1.00000000  0.3690085
+## runtime        -0.11755139  0.36478766  0.3704819  0.36900845  1.0000000
+## thtr_rel_year   0.99911576 -0.10003331 -0.3738097 -0.23394879 -0.1245589
+## imdb_rating    -0.20559467 -0.17300644  0.1794903  0.12429683  0.3474642
+## imdb_num_votes -0.01298938  0.20040862  0.4292512  0.41198038  0.4705619
+## critics_score  -0.20902102 -0.15618645  0.1939696  0.12871453  0.1925464
+##                thtr_rel_year imdb_rating imdb_num_votes critics_score
+## year              0.99911576  -0.2055947    -0.01298938    -0.2090210
+## budget           -0.10003331  -0.1730064     0.20040862    -0.1561865
+## domgross         -0.37380968   0.1794903     0.42925116     0.1939696
+## intgross         -0.23394879   0.1242968     0.41198038     0.1287145
+## runtime          -0.12455886   0.3474642     0.47056195     0.1925464
+## thtr_rel_year     1.00000000  -0.2064607    -0.01663107    -0.2026253
+## imdb_rating      -0.20646068   1.0000000     0.59213256     0.7555322
+## imdb_num_votes   -0.01663107   0.5921326     1.00000000     0.3832688
+## critics_score    -0.20262532   0.7555322     0.38326880     1.0000000
+##                audience_score         ROI
+## year              -0.27348845 -0.11861473
+## budget            -0.26084253 -0.15738606
+## domgross           0.14623480  0.25184499
+## intgross           0.07108851  0.19872773
+## runtime            0.23606990 -0.10157867
+## thtr_rel_year     -0.27183192 -0.10957451
+## imdb_rating        0.90368952  0.18785915
+## imdb_num_votes     0.43239796  0.06505055
+## critics_score      0.71788639  0.23942722
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 2 rows ]</code></pre>
+<pre class="r"><code>#assign movie titles to row names
+rownames(bech_nums) &lt;- bech1$title
+
+#run pca and summarize
+bech_pca &lt;- princomp(bech_nums)
+summary(bech_pca, loadings=T)</code></pre>
+<pre><code>## Importance of components:
+##                           Comp.1    Comp.2    Comp.3    Comp.4     Comp.5
+## Standard deviation     1.9611200 1.5597542 1.3351310 1.0643341 0.73627758
+## Proportion of Variance 0.3524105 0.2229219 0.1633384 0.1037998 0.04967337
+## Cumulative Proportion  0.3524105 0.5753324 0.7386708 0.8424706 0.89214397
+##                            Comp.6     Comp.7     Comp.8      Comp.9     Comp.10
+## Standard deviation     0.66915449 0.58096705 0.51978643 0.264230932 0.225950020
+## Proportion of Variance 0.04102922 0.03092741 0.02475656 0.006397463 0.004678054
+## Cumulative Proportion  0.93317320 0.96410060 0.98885716 0.995254628 0.999932682
+##                             Comp.11
+## Standard deviation     2.710468e-02
+## Proportion of Variance 6.731769e-05
+## Cumulative Proportion  1.000000e+00
+## 
+## Loadings:
+##                Comp.1 Comp.2 Comp.3 Comp.4 Comp.5 Comp.6 Comp.7 Comp.8 Comp.9
+## year            0.277         0.598  0.179         0.101                     
+## budget         -0.129 -0.507  0.145 -0.131  0.168  0.363 -0.673  0.250       
+## domgross       -0.362 -0.366         0.246  0.154         0.390         0.155
+## intgross       -0.323 -0.409  0.114  0.250  0.212         0.331        -0.229
+## runtime        -0.275 -0.143  0.269 -0.395 -0.736  0.269  0.216 -0.109       
+## thtr_rel_year   0.278         0.595  0.187         0.105                     
+## imdb_rating    -0.380  0.364  0.142                              0.303 -0.736
+## imdb_num_votes -0.337         0.380               -0.714 -0.338 -0.283  0.155
+## critics_score  -0.336  0.334                0.317  0.501        -0.633       
+##                Comp.10 Comp.11
+## year                    0.706 
+## budget                        
+## domgross        0.683         
+## intgross       -0.662         
+## runtime                       
+## thtr_rel_year          -0.708 
+## imdb_rating     0.230         
+## imdb_num_votes                
+## critics_score                 
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 2 rows ]</code></pre>
+<pre class="r"><code>eigval &lt;-  bech_pca$sdev^2 #square to convert SDs to eigenvalues
+#proportion of variance explained by each PC
+varprop=round(eigval/sum(eigval), 2)
+
+#ggplot to determine &quot;elbow&quot;
+ggplot() + geom_bar(aes(y=varprop, x=1:11), stat=&quot;identity&quot;) + xlab(&quot;&quot;) + geom_path(aes(y=varprop, x=1:11)) + 
+  geom_text(aes(x=1:11, y=varprop, label=round(varprop, 2)), vjust=1, col=&quot;white&quot;, size=5) + 
+  scale_y_continuous(breaks=seq(0, .6, .2), labels = scales::percent) + 
+  scale_x_continuous(breaks=1:10)</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>#it appears to break at 5, though it is not super sharp, so we will go with 5 principal components
+
+#visualizing how our variables break down across PC1 and PC2
+bech_pca$loadings[1:11, 1:2] %&gt;% as.data.frame %&gt;% rownames_to_column %&gt;% 
+ggplot() + geom_hline(aes(yintercept=0), lty=2) + 
+  geom_vline(aes(xintercept=0), lty=2) + ylab(&quot;PC2&quot;) + xlab(&quot;PC1&quot;) + 
+  geom_segment(aes(x=0, y=0, xend=Comp.1, yend=Comp.2), arrow=arrow(), col=&quot;red&quot;) + 
+  geom_label(aes(x=Comp.1*1.1, y=Comp.2*1.1, label=rowname))</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-15-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>bech1 %&gt;% mutate(PC1=bech_pca$scores[, 1], PC2=bech_pca$scores[, 2]) %&gt;%
+  ggplot(aes(PC1, PC2, color=year)) + geom_point() + coord_fixed()</code></pre>
+<p><img src="/project1_files/figure-html/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" />
+From our findings, we can see that theater release year and year is the greatest negatively correlated from the rest of the variables, but extremely correlated with each other (nearly 1). Audience score, critic score, and IMDB rating are all so correlated they are nearly synonymous. We can also see the budget and ratings are not very correlated at all, probably because most movies have similar budgets but very widely varying opinion on the movie. In addition, domestic and international gross are both very correlated. Overall, there aren’t very clear principle components to our data, and it is difficult to distinguish them into distinct groups as seen on our ggplot, because most of the points are clustered into one group even across the 2 major principal components.</p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="/js/docs.min.js"></script>
+<script src="/js/main.js"></script>
+
+<script src="/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

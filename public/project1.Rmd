@@ -1,0 +1,254 @@
+---
+title: "Project 1"
+author: "Deniz Sevilmis-yds255"
+date: "3/15/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = F, message = F,
+tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
+```
+
+###Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
+For my project, I have selected FiveThirtyEight's 'bechel' dataset and the 'movies' dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes' websites. The 'bechdel' df can be pulled up by downloading/calling the FiveThirtyEight package and the 'movies' dataset can be found here: http://www2.stat.duke.edu/~mc301/data/movies.html. 
+
+####movies
+The 'movies' dataset is a dataframe that contains 651 randomly sampled movies released between 1972 and 2014 in the US and their IMDB and Rotten Tomatoes data. The variables include title, genre, runtime, year (released), director, imdb_id, studio, and mpaa rating(g, pg, pg-13, etc.), which are all pretty self explanatory. It also includes audience_score and critics_score (% positive ratings on Rotten Tomatoes) and the critics_rating (on the "Tomatometer", which is either 'Fresh' or 'Rotten' or 'Certified Fresh'). Fresh being positive critic ratings greater than 60%, Rotten being less than 60% positive critic reviews, and Certified Fresh is a special distinction for the very best rated movies. The audience_score is quite similar but it's represented by a popcorn bucket, and upright means 60%+ positive reviews, and below is spilled. (thtr/dvd)_rel_(year/month/day) is the individual day, month, year it was released in theaters. The best_(pic/actor/actress/director)_(win/nom) refers to Oscars nominations and wins for best picture, director, actor, actress. The only caveat, these nominations and wins are not necessarily for that movie (except best picture), but for one of the main 5 actors or the director in their overall career. Actor1 through actor5 variables are just the main 5 lead actors featured in the movie. Top200_box is whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo.
+
+####bechdel
+The 'bechdel' dataset contains 1794 rows (movies) and 15 variables. **The bechdel test is a measure of how well women are represented in a film. A movie passes the Bechdel test if there are (1) two named women in it, (2) who talk to each other, (3) about something besides a man.** This is a standard for bare minimum of depth for female characters in a film. Year, title, imdb (ID) and budget are pretty self explanatory. The binary variable is just whether is passes or fails the test; test is the bechdel result with 'ok' if pass, or the reason why it didn't pass, and if it says '-disagree' there has been debate about whether that factor could be debated. The clean_test variable is the same as test but doesn't include these discrepancies. Domgross and intgross are domestic and international gross in US dollars and the same variables with "_2013" at the end are just inflation-adjusted. The variables code, decade_code, and period_code are irrelevant and will be dropped.
+
+The data should be interesting to explore and see if the depth of female representation and interaction in movies has a positive or negative effect on the approval of critics, the public, or the profitability of the movie. I hope to find some kind of correlational evidence of movies that pass the Bechdel test performing better in the box office and ratings overall, disproving the belief that having females play a large role in films will hurt the profitability or approval, or possibly seeing which studios or genres are more likely to produce movies that pass the Bechdel test.
+
+```{R}
+#Loading packages and datasets
+library(fivethirtyeight)
+library(tidyverse)
+library(cluster)
+library(knitr)
+library(kableExtra)
+bechdel<-read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/bechdel/movies.csv")
+load("/cloud/project/content/movies.Rdata")
+
+#Having a look at our data
+glimpse(bechdel)
+glimpse(movies)
+```
+
+##Tidying and Joining
+```{R}
+#get imdb ID's
+imdb<-gsub("http://www.imdb.com/title/", "", movies$imdb_url)
+imdb<-gsub("/", "", imdb)
+movies$imdb <- imdb
+movies%>%select(title, imdb)%>%glimpse()
+
+#inner join
+bechdat<-bechdel%>%inner_join(movies, by = 'imdb')
+```
+First I had to change the variable imdb_url (starts with 'tt') to drop the link before and after it so I could join by imdb ID because joining by title caused problems and repeats. I chose an inner join because I only wanted movies present in both datasets because I wanted to be able to compare across multiple categories without N/A's, I knew there would still be a lot of observations left over, even after dropping many movies. I also did this because there are so many variables, if a movie is missing in one set, there will be a lot of NA's in the overall row. ____ cases were dropped total.
+
+```{R}
+#dropping and renaming variable
+bechdat2<-bechdat%>%
+  select(-code, -rt_url, -imdb_url, -period.code, -decade.code, -test, -budget, -domgross, -intgross, -dvd_rel_year, -dvd_rel_month, -dvd_rel_day, -thtr_rel_month, -thtr_rel_day, -title.x)%>%
+  rename(budget= budget_2013., domgross = domgross_2013., intgross = intgross_2013., title = title.y)
+```
+To clean up the table a bit and remove unnecessary variables, I dropped the variables code, rt_url, period.code, decade.code, dvd_rel_(year/month/day), thtr_rel_month/day for irrelevance. I dropped test because I am using clean_test for a more detailed/clear bechdel test result. We're also dropping budget, domgross, intgross in exchange for the inflation adjusted "_13" versions, which we will rename to the former. When joining we had two variables named title, which became title.x and title.y, so I dropped .x and renamed it to just title.
+
+```{R}
+bech1<-bechdat2%>%pivot_longer(cols = c('actor1':'actor5'), names_to = 'role', values_to = 'actors')%>%
+  select(-role)
+bech1<-bech1%>% group_by(imdb)%>%
+  mutate(lead_actors = paste(actors, collapse = ", "))%>%
+  select(-actors)%>%
+  distinct(lead_actors, .keep_all= TRUE)%>%
+  ungroup()
+bech1%>%select(imdb, title, lead_actors)
+```
+There was a separate column for each lead actor, which I found unnecessary, so I combined all 5 into one observation under the variable lead_actors. Used pivot longer to combine all actors into one variable and be able to group by movie later. Used paste and collapse to form a string of values separated by a comma and space to list the top 5 actors per movie in a single row so there wasn't duplicate data of every movie. We removed duplicate rows using the .keep_all function above.
+
+```{R}
+#fix repeat studios
+bech1$studio<- gsub("The Weinstein Company", "The Weinstein Co.", bech1$studio)
+bech1$studio<- gsub("Weinstein Company", "The Weinstein Co.", bech1$studio)
+bech1$studio<- gsub("Paramount Studios", "Paramount Pictures", bech1$studio)
+bech1$studio<- gsub("Warner Bros. Pictures", "Warner Bros.", bech1$studio)
+
+bech1%>%select(studio)%>%glimpse()
+```
+Fixed as many of the repeat studios as I could using gsub.
+
+```{R}
+#drop N/A, make ROI var
+bech1<- bech1 %>% mutate_at(c("domgross", "intgross"), function(x)as.numeric(as.character(x))) %>%
+  filter(intgross != "#N/A") %>% na.omit %>%mutate(ROI= (intgross/budget))
+bech1
+```
+Dropped a single movie with '#N/A' for both intgross and domgross, then made a new variable called ROI (Return on Investment) using mutate() which indicates what percent of the initial investment(budget) is returned by movie's gross profits (intgross). Also used na.omit() because there was only one movie ("London to Brighton") that had NA for domgross.
+
+```{R}
+bech1<- bech1%>%mutate(clean_test = str_replace_all(clean_test, 
+                                      "ok",
+                                      "Passes Bechdel Test"),
+         clean_test = str_replace_all(clean_test, "men",
+                                      "Women Only Talk About Men"),
+         clean_test = str_replace_all(clean_test, "notalk",
+                                      "Women Don't Talk To Each Other"),
+         clean_test = str_replace_all(clean_test, "nowoWomen Only Talk About Men",
+                                      "Fewer Than Two Women"),
+         clean_test = str_replace_all(clean_test, "dubious",
+                                      "Dubious"))
+```
+Changed names of clean_test values to more accurately reflect what they mean, previous names were very unclear and hard to interpret.
+
+```{R}
+#make century var
+bech1$century<- ifelse(bech1$year < 2000,"Pre","Post")
+
+#change fctr to categ
+bech1<-bech1 %>% mutate_at(c("best_pic_nom", "best_pic_win", "best_actor_win", "best_actress_win", "best_dir_win", "top200_box"), function(x)as.character(as.factor(x)))
+
+#categorical to binary
+bech1<- bech1%>%mutate(best_pic_nom = if_else(best_pic_nom == "yes", TRUE, FALSE), 
+               best_pic_win = if_else(best_pic_win == "yes", TRUE, FALSE),
+               best_actor_win = if_else(best_actor_win == "yes", TRUE, FALSE),
+               best_actress_win = if_else(best_actress_win == "yes", TRUE, FALSE),
+               best_dir_win = if_else(best_dir_win == "yes", TRUE, FALSE),
+               top200_box = if_else(top200_box == "yes", TRUE, FALSE))
+bech1<- bech1%>%mutate(binary2 = if_else(binary == "PASS", TRUE, FALSE))
+```
+Made century var to indicate if made before or after 2000, changed the factor variables to binary in order to easier compute summary statistics using mean() and sum() to get count and proportion.
+
+##Summary Statistics
+```{R}
+#the very top rated movies and whether or not they passed
+sum1 <- bech1%>%select(title, audience_rating, critics_rating, top200_box, binary)%>%filter(audience_rating == "Upright", critics_rating == "Certified Fresh", top200_box == TRUE)
+sum1%>%kable()%>%kable_styling(bootstrap_options = "striped", full_width = F)
+
+#paramount pics makes the most passing films
+sum2 <- bech1%>%group_by(studio)%>%filter(binary == "PASS")%>%summarise(n_pass = n())%>%arrange(desc(n_pass))
+sum2%>%glimpse
+
+#mean, med, sd of critics score grouped by bechdel test indicators
+sum3 <- bech1%>%group_by(clean_test)%>%
+  summarise(med_ROI = median(ROI), mean_critic = mean(critics_score), sd_critic = sd(critics_score))%>%arrange(desc(med_ROI))
+sum3%>%kable()%>%kable_styling(bootstrap_options = "striped", full_width = F)
+
+#greatest budgets go to movies where women don't talk to each other but they have the lowest median ROI
+sum4 <- bech1%>%group_by(binary, clean_test)%>%
+  summarise(med_ROI = median(ROI), med_budget = median(budget), med_intgross = median(intgross))%>%arrange(desc(med_ROI))
+sum4%>%kable()%>%kable_styling(bootstrap_options = "striped", full_width = F)
+
+#most grammy wins are given to bechdel passing test
+sum5 <- bech1%>%group_by(binary, clean_test)%>%summarise(sum(best_pic_nom), n_best_pic_win = sum(best_pic_win), sum(best_dir_win), sum(best_actor_win), sum(best_actress_win))%>%arrange(desc(n_best_pic_win))%>%select(binary, clean_test, n_best_pic_win, everything())
+sum5%>%kable()%>%kable_styling(bootstrap_options = "striped", full_width = F)
+
+#more pass test since 2000
+sum6 <- bech1%>%group_by(century)%>%summarise(tot_pass = sum(binary2), n = n(), percent_pass = mean(binary2))%>%arrange(desc(percent_pass))
+sum6%>%kable()%>%kable_styling(bootstrap_options = "striped", full_width = F)
+```
+Summary 1- Out of the movies that scored the top ranking on IMDB for both critics and audience, and were in the top 200 box office, most actually failed the Bechdel test.
+Summary 2- Paramount Studios produces the most films passing the Bechdel test (may be a good place to go if you're a woman in the film industry!).
+Summary 3- Across the different Bechdel Test requirements, movies that passed or failed (doesn't matter why they failed) are not rated significantly different by critics. However, movies where there are less than 2 named women seemed to have the largest return on investment (this could possibly be due to a small budget given to these types of movies, or maybe a small budget means less actors & actress a producer is able to hire).
+Summary 4- The greatest budgets go to movies where women don't talk to each other but they also have the lowest median ROI- even if producers had women just talking to each other about a man, their ROI could shoot up to 5.24x ROI!
+Summary 5- The most Grammy wins across EVERY category goes to movies that PASS the Bechdel Test (woo!).
+Summary 6- A greater percent of movies produced in the 21st century pass the test as opposed to before - yay, progress.
+
+```{R}
+#correlation matrix of most numeric variables
+bech_cor <- bech1 %>% select_if(is.numeric) %>% select(-thtr_rel_year, -imdb_num_votes) %>% na.omit %>% cor()
+bech_cor
+```
+
+##Visualisations
+
+```{R}
+#cor heatmap
+library(ggcorrplot)
+ggcorrplot(bech_cor, colors = c("steelblue1", "white", "deeppink"))+labs(title = "Bechdel Movie Data Correlations")
+```
+From our heatmap, we can see the darker pink areas have the greatest correlation. Off the bat, some of the darkest correlations are intgross~domgross, audience_score~imdb_rating, critics_score~imdb_rating, audience_score~critics_score, int_gross~budget, then it starts to get very weakly correlated. It makes sense that domestic and international gross are very highly correlated because intgross encompasses domgross, and usually if a film is very popular domestically, there is a good chance it will be internationally as well. The audience score, critics score, and IMDB score are all correlated with each other, probably because the audience is usually the one filling out IMDB scores on the site, and if they are reviewing on one site, it is likely they would review on another (Rotten Tomatoes & IMDB). Additionally critics are technically audience too, so they probably have similar reviews to audience, but it is also possible that outside of formal, professional reviews, they could leave personal ones too. Finally, the international gross and budget being correlated makes sense because the more money you tend to put in a production, usually the better made it is, and the more well received it'll be both domestically and abroad.
+```{R}
+#ggplot1 with stat summary
+library(scales)
+bech1%>%ggplot()+geom_bar(aes(x=genre, y= intgross, fill=genre), stat = "summary", fun.y="mean")+
+  scale_fill_brewer(palette = "PiYG", direction = -1)+
+  geom_errorbar(stat = "summary", fun.data= mean_se, aes(x=genre, y=intgross), width=.5)+
+  theme(axis.ticks = element_blank(), axis.text.x = element_blank())+
+  coord_flip() +
+  scale_y_continuous(trans=log_trans(), name = "Log(Mean International Gross) ($USD)")+ 
+  facet_wrap(~binary) +
+  labs(title = "Mean International Gross (Scaled) by Bechdel Test Result & Genre")+
+  theme(plot.title = element_text(hjust = .5))
+```
+Once scaled to account for extremely, internationally popular movies, we can see that not only is there very few real significant differences in international gross across movie genres in both movies that pass and fail the test (some that stick out as statistically different would be musicals as being statistically lower on average than comedy, mystery, drama, action), but potentially science fiction/fantasy movies do better when it passes the bechdel test. Otherwise, passing or failing the Bechdel test doesn't really seem to hurt or help your international gross across genres.
+
+```{R}
+#ggplot2
+
+bech1%>%ggplot()+geom_bar(aes(x=critics_rating, fill=binary))+facet_wrap(~clean_test)+ scale_fill_manual(values = c("lightskyblue", "pink")) +
+  labs(title = "Rotten Tomatoes Critic Rating vs. Bechdel Test Results",
+       x = "Rotten Tomatoes Critic Rating",
+       y = "Number of Movies",
+       fill= "Bechdel Test") +
+  theme(plot.title = element_text(hjust = .5))
+```
+In this one, we can see that there are many more movies that rate in the Certified Fresh and Fresh categories than any of the failing categories. Granted, there are greater numbers in the passing because the failing movies have been split up across categories, but even when put back together, there are 27/56 (48%) movies that pass and are Certified Fresh as compared to 33/71 (45%) movies that fail and are rated Certified Fresh, so the percent of movies that score higher by critics on Rotten Tomatoes is greater.
+
+```{R}
+#ggplot3
+bech1%>%ggplot()+geom_boxplot(aes(x=mpaa_rating, y=imdb_rating, fill=binary))+
+  facet_wrap(~binary)+scale_fill_brewer(palette = "PiYG", direction = -1) +
+  labs(title = "MPAA rating vs. IMDB rating",
+       subtitle = "Grouped by Pass/Fail of Bechdel Test",
+       x = "MPAA rating",
+       y = "IMDB Rating (1-10 stars)") +
+  theme(legend.position = "none", plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+
+```
+We can see that there is no significant difference in IMDB ratings across films that pass or fail the Bechdel test, and across MPAA ratings. It is interesting to note here, that there are no rated G movies that pass the Bechdel test. If we use MPAA rating as a proxy for target audience, it is interesting to see there are no real kids movies that truly represent women, which also suggests a lack of depth in role models for young girls- this is something that could be explored further.
+
+
+##Running Principal Component Analysis
+```{R}
+#select all numeric variables and scale them
+bech_nums <- bech1 %>% select_if(is.numeric) %>% scale()
+
+#examine covariance
+bech_nums%>%cov
+
+#assign movie titles to row names
+rownames(bech_nums) <- bech1$title
+
+#run pca and summarize
+bech_pca <- princomp(bech_nums)
+summary(bech_pca, loadings=T)
+
+eigval <-  bech_pca$sdev^2 #square to convert SDs to eigenvalues
+#proportion of variance explained by each PC
+varprop=round(eigval/sum(eigval), 2)
+
+#ggplot to determine "elbow"
+ggplot() + geom_bar(aes(y=varprop, x=1:11), stat="identity") + xlab("") + geom_path(aes(y=varprop, x=1:11)) + 
+  geom_text(aes(x=1:11, y=varprop, label=round(varprop, 2)), vjust=1, col="white", size=5) + 
+  scale_y_continuous(breaks=seq(0, .6, .2), labels = scales::percent) + 
+  scale_x_continuous(breaks=1:10)
+#it appears to break at 5, though it is not super sharp, so we will go with 5 principal components
+
+#visualizing how our variables break down across PC1 and PC2
+bech_pca$loadings[1:11, 1:2] %>% as.data.frame %>% rownames_to_column %>% 
+ggplot() + geom_hline(aes(yintercept=0), lty=2) + 
+  geom_vline(aes(xintercept=0), lty=2) + ylab("PC2") + xlab("PC1") + 
+  geom_segment(aes(x=0, y=0, xend=Comp.1, yend=Comp.2), arrow=arrow(), col="red") + 
+  geom_label(aes(x=Comp.1*1.1, y=Comp.2*1.1, label=rowname))
+
+
+bech1 %>% mutate(PC1=bech_pca$scores[, 1], PC2=bech_pca$scores[, 2]) %>%
+  ggplot(aes(PC1, PC2, color=year)) + geom_point() + coord_fixed()
+
+```
+From our findings, we can see that theater release year and year is the greatest negatively correlated from the rest of the variables, but extremely correlated with each other (nearly 1). Audience score, critic score, and IMDB rating are all so correlated they are nearly synonymous. We can also see the budget and ratings are not very correlated at all, probably because most movies have similar budgets but very widely varying opinion on the movie. In addition, domestic and international gross are both very correlated. Overall, there aren't very clear principle components to our data, and it is difficult to distinguish them into distinct groups as seen on our ggplot, because most of the points are clustered into one group even across the 2 major principal components.
