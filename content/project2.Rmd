@@ -1,0 +1,307 @@
+---
+title: "Project 2"
+author: "Yasemin Deniz Sevilmis"
+date: "4/22/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, warning=FALSE, fig.width=8, tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+## Deniz Sevilmis - yds255
+
+*Introduce your dataset and each of your variables (or just your main variables if you have lots) in a paragraph. What are they measuring? How many observations?*
+
+My dataset comes from a University of California Irvine dataset that combines heart disease data from around the world, but I am only using the subset of data that comes from Cleveland, which has also been used in machine learning studies. The dataset includes various cardiac health related variables for each patient and whether or not the patient has heart disease (binary). All variables are explained below (after tidying).
+
+Data from: https://www.kaggle.com/ronitf/heart-disease-uci
+Orignal Study/Info from: https://archive.ics.uci.edu/ml/datasets/Heart+Disease
+
+Variables:
+age (years)
+sex (1= Male, 0=Female)
+cp (chest pain, 4 types; 
+            1: typical angina Value 
+            2: atypical angina Value 
+            3: non-anginal pain Value 
+            4: asymptomatic)
+bp (resting blood pressure in mmHg upon admission to hospital)
+chol (serum cholesterol, mg/dL)
+fbs (fasting blood sugar >120 mg/dL; 1=yes, 0=no)
+ekg (resting ekg results, 
+            0: normal
+            1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV)
+            2: showing probable or definite left ventricular hypertrophy by Estes' criteria)
+maxHR (max heart rate achieved, BPM)
+exang (exercise induced angina, 1= present, 0= absent)
+ST (ST depression induced by exercise relative to rest)
+slope (slope of the peak exercise ST segment, 
+            Value 1: upsloping
+            Value 2: flat
+            Value 3: downsloping)
+ves (number of major vessels (0-3) colored by flouroscopy)
+heartd (heart disease, 1= yes, 0= no)
+
+```{R}
+#load packages
+library(tidyverse)
+library(sandwich)
+library(lmtest)
+#upload data
+heart<-read.csv("cloud/project/content/heart.csv")
+heart<-heart%>%rename(bp=trestbps, ekg=restecg, maxHR=thalach, ST=oldpeak, ves=ca, heartd=target)
+heart<-heart%>%select(-thal)
+#heart$y<-ifelse(heart$heartd==1,1,0)
+heart<-heart%>%mutate(y = if_else(heartd == "1", TRUE, FALSE))
+#numeric to discrete where needed
+heart$sex <- as.factor(heart$sex)
+heart$cp <- as.factor(heart$cp)
+heart$fbs <- as.factor(heart$fbs)
+heart$ekg <- as.factor(heart$ekg)
+heart$exang <- as.factor(heart$exang)
+heart$slope <- as.factor(heart$slope)
+heart$ves <- as.factor(heart$ves)
+
+```
+
+## MANOVA/ANOVA
+*Perform a MANOVA testing whether any of your numeric variables (or a subset of them, if including them all doesn't make sense) show a mean difference across levels of one of your categorical variables (3). If they do, perform univariate ANOVAs to find response(s) showing a mean difference across groups (3), and perform post-hoc t tests to find which groups differ (3). Discuss the number of tests you have performed, calculate the probability of at least one type I error (if unadjusted), and adjust the significance level accordingly (bonferroni correction) before discussing significant differences (3). Briefly discuss assumptions and whether or not they are likely to have been met (2).*
+
+```{R}
+man1<-manova(cbind(bp, maxHR, ST, chol, age)~y, data=heart)
+summary(man1)
+summary.aov(man1) #get univariate ANOVAs from MANOVA
+
+heart%>%group_by(y)%>%summarize(mean(bp),mean(maxHR), mean(ST), mean(age))
+
+#pairwise t tests
+pairwise.t.test(heart$bp,heart$y, p.adj="none")
+pairwise.t.test(heart$maxHR,heart$y, p.adj="none")
+pairwise.t.test(heart$ST,heart$y, p.adj="none")
+pairwise.t.test(heart$age,heart$y, p.adj="none")
+```
+Did 1 MANOVA, 5 ANOVAs, and 4 t tests (10 tests); alpha = 0.05/10 = 0.005. Three t tests still show significance (maxHR, ST, age) but BP is no longer significant. 
+```{R}
+#multivariate normality example (1 of 25 possible)
+ggplot(heart, aes(x = bp, y = maxHR)) +
+  geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~y)
+```
+Due to the academic nature of the study, it is likely that all participants are randomly sampled, and all are independent observations. Each group (y = 1 or 0, or heart disease present/absent) has over 25+ individuals/data points so we can assume multivariate normality of DVs. Just to make sure, I ran a couple of the plots (like the one above, as an example) to make sure they looked normal. We will also assume that covariances are relatively homogenous, and no outliers are evident, so MANOVA can be considered appropriate.
+
+*Perform some kind of randomization test on your data (that makes sense). This can be anything you want! State null and alternative hypotheses, perform the test, and interpret the results (7). Create a plot visualizing the null distribution and the test statistic (3).*
+
+```{R}
+#H0: Mean cholesterol is the same between those with heart disease and those without.
+#HA: Mean cholesterol is different between those with heart disease and those without.
+
+#diff in means
+heart%>%group_by(heartd)%>%
+  summarize(means=mean(chol))%>%summarize(`mean_diff:`=diff(means))
+
+#randomization test
+rand_dist<-vector()
+for(i in 1:5000){
+new<-data.frame(chol=sample(heart$chol), heartd=heart$heartd)
+rand_dist[i]<-mean(new[new$heartd== 1,]$chol)-
+              mean(new[new$heartd== 0,]$chol)}
+
+#interpret
+mean(rand_dist>8.856653 | rand_dist< -8.856653)
+t.test(data=heart,chol~heartd)
+
+#plot
+{hist(rand_dist,main="",ylab=""); abline(v = c(-8.856653,8.856653),col="red")}
+
+```
+The difference in means between the two groups of patients is 8.857 mg/dL. After running the randomization test, we can see that we get a p value of 0.1374 which is NOT lower than 0.05 so the difference in cholesterol is not significant between those with heart disease and those without. Essentially, both those with and without heart disease they have the same mean cholesterol. To make sure, we ran a Welch's t-test, and the p is slightly smaller (makes sense because parametric) and pretty much matches/confirms our own p statistic.
+
+*Build a linear regression model predicting one of your response variables from at least 2 other variables, including their interaction. Mean-center any numeric variables involved in the interaction.*
+
+    - Interpret the coefficient estimates (do not discuss significance) (10)
+    - Plot the regression using `ggplot()`. (8)
+    - Check assumptions of linearity, normality, and homoskedasticity either graphically or using a hypothesis test (4)
+    - Regardless, recompute regression results with robust standard errors via `coeftest(..., vcov=vcovHC(...))`. 
+    - Discuss significance of results, including any changes from before/after robust SEs if applicable. (8)
+    - What proportion of the variation in the outcome does your model explain? (4)
+
+```{R}
+#mean centered variables
+heart$bp_c <- heart$bp - mean(heart$bp)
+heart$maxHR_c <- heart$maxHR - mean(heart$maxHR)
+
+#linear reg model
+fit<- lm(age~bp_c*maxHR_c, data = heart)
+summary(fit)
+```
+According to our model, the predicted age for a person of average BP and average Max HR is 54.4 years old. Controlling for max HR (heart rate) for every 1 mmHg(unit) increase in BP from the mean, we expect to see the predicted age increase 0.138 years from the average age. Controlling for BP, every 1 bpm (unit) increase of the max HR from the mean decreases the predicted age by 0.153 years. The slope for BP_c on age is 0.0018 greater for every 1 unit increase of max HR from the mean. As BP increases each mmHg from the mean BP, the effect of an additional bpm of max HR from the mean on age increases by .0018 years. (All disregarding significance)
+
+```{R}
+#plot
+ggplot(heart,aes(y=age,x=bp_c,color=maxHR_c))+geom_point()+stat_smooth(method="lm",se=FALSE)
+
+#check assumptions
+bptest(fit) #H0 = homoskedastic
+#cannot reject the null (p=0.128), homoskedastic
+
+#robust SE
+coeftest(fit, vcov=vcovHC(fit))
+
+#prop of variation explained by model (R^2 value)
+summary(fit)
+```
+R^2 is the proportion of variation in the response variable explained by the overall model (all predictors at once), which is 0.2328, or 0.2251 if we account for a penalty with each extra explanatory variable.
+
+
+*Rerun same regression model (with interaction), but this time compute bootstrapped standard errors. Discuss any changes you observe in SEs and p-values using these SEs compared to the original SEs and the robust SEs)*
+
+```{R}
+#sample
+boot_dat<- sample_frac(heart, replace=T)
+
+# repeat 5000 times
+samp_distn<-replicate(5000, {
+  boot_dat <- sample_frac(heart, replace=T) #bootstrap data
+  fit <- lm(age~bp_c*maxHR_c, data=boot_dat) #fit model
+  coef(fit) #save coefs
+})
+
+#bootstrap SEs
+samp_distn %>% t %>% as.data.frame %>% summarize_all(sd)
+
+#compare
+coeftest(fit)[,1:2] #original
+coeftest(fit, vcov=vcovHC(fit))[,1:2] #robust
+
+```
+The bootstrap SEs have the lowest values for the explanatory variables, compared to the original SEs and the robust SEs. The bp_c SE is 0.0245, maxHR_C is 0.0197, and the interaction is 0.0012. All of these explanatory variables SE dropped from both the robust and original. The SE intercept for the bootstrap model was 0.4570, which is also lower than the both other models. Since all of the SE's dropped for the variables, we have a more confident model, and the p values must be lower in the bootstrap model than those found for both the other 2 models.
+
+*Perform a logistic regression predicting a binary categorical variable (if you don't have one, make/get one) from at least two explanatory variables (interaction not necessary).*
+
+ - Interpret coefficient estimates in context (10)
+    - Report a confusion matrix for your logistic regression (2)
+    - Compute and discuss the Accuracy, Sensitivity (TPR), Specificity (TNR), and Recall (PPV) of your model (5)
+    - Using ggplot, plot density of log-odds (logit) by your binary outcome variable (3)
+    - Generate an ROC curve (plot) and calculate AUC (either manually or with a package); interpret (10)
+    - Perform 10-fold (or repeated random sub-sampling) CV and report average out-of-sample Accuracy, Sensitivity, and Recall (10)
+
+```{R}
+#log reg
+fit<-glm(y~age+sex+cp+bp+chol+maxHR+ST+ves,data=heart,family=binomial(link="logit")) 
+coeftest(fit)
+exp(coef(fit))
+```
+Interpretation:
+Everything except age and ves4 have a significant impact on whether a patient has heart disease. Controlling for everything else (age, cp1-3, bp, chol, maxHR, ST, ves1-4), odds of heart disease for a male is 0.14 times the odds of a woman. Controlling for everything else (too long to list, see above), odds of heart disease for those with chest pain type 1 is 4.68 times the odds of someone with no chest pain (cp4). Controlling for everything else, odds of heart disease for those with chest pain type 2 is 9.31x times the odds of someone with no chest pain (cp4). Controlling for everything else, odds of heart disease for those with chest pain type 3 is 11.86x times the odds of someone with no chest pain (cp4). Controlling for everything else, for every 1 unit increase of BP, the odds of having heart disease decrease by a factor of 0.97. Controlling for everything else, for every 1 unit increase of cholesterol, the odds of having heart disease decrease by a factor of 0.99. Controlling for everything else, for every 1 unit increase of max HR, the odds of having heart disease increase by a factor of 1.03. Controlling for everything else, for every 1 unit increase of ST, the odds of having heart disease decrease by a factor of 0.51. Observing 1, 2, or 3 major vesicles all significantly decrease the odds of getting heart disease, seeing no vesicles (ves4) is insignificant and doesn't strongly affect the prediction of heart disease. Age as well doesn't significantly impact whether someone is predicted to have heart disease.
+
+```{R}
+#conf matrix
+tdat<-heart%>%mutate(prob=predict(fit, type="response"), prediction=ifelse(prob>.5,1,0))
+classify<-tdat%>%transmute(prob,prediction,truth=heartd)
+table(prediction=classify$prediction,truth=classify$truth)%>%addmargins()
+
+#function for classification diagnostics
+prob=predict(fit, type="response")
+class_diag <- function(probs,truth){
+  #CONFUSION MATRIX: CALCULATE ACCURACY, TPR, TNR, PPV
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+    #CALCULATE EXACT AUC
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  TPR=cumsum(truth)/max(1,sum(truth))
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+  data.frame(acc,sens,spec,ppv,auc)
+}
+#results
+class_diag(prob, heart$y)
+
+#ggplot
+heart$logit<-predict(fit,type="link") #get predicted logit scores (logodds)
+
+heart%>%ggplot()+geom_density(aes(logit,color=y,fill=y), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("logit (log-odds)")+
+  geom_rug(aes(logit,color=y))
+```
+
+```{R}
+#ROC and AUC
+library(plotROC)
+prob<-predict(fit,type="response")
+ROCplot<-ggplot(heart)+geom_roc(aes(d=y,m=prob), n.cuts=0)
+ROCplot
+calc_auc(ROCplot)
+```
+The ROC is pretty good, the shape is a near right angle, so we are predicting really well and are close to a TPR of 1 and FPR of 0, with good sensitivity and specificity. The area under the curve is 0.92, so on average, 92% of the time we are correctly predicting someone with heart disease to have it. This is considered a 'Great' AUC. It is also the probability that a randomly selected person with heart disease has a higher predicted probability than a randomly selected person without heart disease. 
+
+```{R}
+#CV
+set.seed(1234)
+k=10 #choose number of folds
+data<-heart[sample(nrow(heart)),] #randomly order rows
+folds<-cut(seq(1:nrow(heart)),breaks=k,labels=F) #create folds
+diags<-NULL
+for(i in 1:k){
+  ## Create training and test sets
+  train<-data[folds!=i,]
+  test<-data[folds==i,]
+  truth<-test$y ## Truth labels for fold i
+  ## Train model on training set (all but fold i)
+  fit<-glm(y~age+sex+cp+bp+chol+maxHR+ST+ves,data=train,family="binomial")
+  ## Test model on test set (fold i)
+  probs<-predict(fit,newdata = test,type="response")
+  ## Get diagnostics for fold i
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+summarize_all(diags,mean) #average diagnostics across all k folds, out-of-sample
+
+```
+
+*Choose one variable you want to predict (can be one you used from before; either binary or continuous) and run a LASSO regression inputting all the rest of your variables as predictors. Choose lambda to give the simplest model whose accuracy is near that of the best (i.e., `lambda.1se`). Discuss which variables are retained. Perform 10-fold CV using this model: if response in binary, compare model's out-of-sample accuracy to that of your logistic regression in part 5; if response is numeric, compare the residual standard error (at the bottom of the summary output, aka RMSE): lower is better fit!*
+
+```{R}
+#drop heartd col b/c exact same thing as y; drop other later created variables
+
+heart1<- heart%>%select(-heartd, -bp_c, -maxHR_c, -logit)
+
+library(glmnet)
+y<-as.matrix(heart1$y) #grab response
+x<-model.matrix(y~.,data=heart1)[,-1] #grab predictors
+head(x)
+x<-scale(x) #standardize
+
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+#CV 10-fold
+set.seed(1234)
+k=10
+data <- heart1 %>% sample_frac #put rows of dataset in random order
+folds <- ntile(1:nrow(data),n=10) #create fold labels
+diags<-NULL
+for(i in 1:k){
+  train <- data[folds!=i,] #create training set (all but fold i)
+  test <- data[folds==i,] #create test set (just fold i)
+  truth <- test$y #save truth labels from fold i
+  fit <- glm(y~sex+cp+bp+ekg+maxHR+exang+ST+slope+ves,
+             data=train, family="binomial")
+  probs <- predict(fit, newdata=test, type="response")
+  diags<-rbind(diags,class_diag(probs,truth))
+}
+diags%>%summarize_all(mean)
+
+```
+From our LASSO, we can see that being male (sex = 1), any type of chest pain (cp types 1-3, cp 4 is no angina), blood pressure (bp), an EKG with ST wave abnormality (ekg1), max heart rate (maxHR), presence of exercise induced angina (exang1), ST depression following exercise, upsloping or flat slope of peak exercise ST segment (slope 1 & 2), and any number of major vessels colored by fluoroscopy (greater than 0, ves 1-3, ves 4 is not known, so makes sense it doesn't matter) are the most predictive variables. All of the discussed variables are retained, the rest with "." are dropped. These are actually exciting results because these variables listed are clinically known to be related to heart disease, and what would be expected to be predictive from a clinical perspective! The AUC is 0.893 which is considered pretty good for predicting presence of heart disease. The accuracy for the LASSO model is 0.855, compared to the model from part 5 which was 0.822, so this model is more accurate.
+
