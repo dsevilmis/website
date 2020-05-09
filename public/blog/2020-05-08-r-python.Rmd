@@ -47,8 +47,8 @@ print(names)
 
 There you have it! A totally practical and super realistic application of using both R and Python in RStudio. Now, with so many options you MAY be feeling a little like this guy:
 
-![](/blog/2020-05-08-r-python_files/rpy2.png)
+![](static/blog/2020-05-08-r-python_files/rpy2.png)
 
 But no fear! At least we all can agree...
 
-![](/blog/2020-05-08-r-python_files/rpy.jpg)
+![](static/blog/2020-05-08-r-python_files/rpy.jpg)
