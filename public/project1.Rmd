@@ -5,6 +5,7 @@ date: "YYYY-MM-DD"
 output:
   html_document: default
   pdf_document: default
+showpagemeta: false
 ---
 
 ```{r setup, include=FALSE}

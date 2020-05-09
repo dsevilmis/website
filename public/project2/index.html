@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Yasemin Deniz Sevilmis" />
     <meta name="description" content="Welcome to my website.">
-    <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../img/favicon.ico">
     <title>Project 2</title>
     <meta name="generator" content="Hugo 0.70.0" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="../css/main.css" />
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
     
@@ -29,7 +29,7 @@
       <nav class="navbar navbar-default">
   <div class="container">
     <div class="navbar-header">
-      <a class="navbar-brand" href="/"><i class="fa fa-home"></i></a>
+      <a class="navbar-brand" href="../"><i class="fa fa-home"></i></a>
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -40,11 +40,11 @@
       <ul class="nav navbar-nav navbar-right">
       
         
-        <li><a href="/blog/">BLOG</a></li>
+        <li><a href="../blog/">BLOG</a></li>
         
-        <li><a href="/projects/">PROJECTS</a></li>
+        <li><a href="../projects/">PROJECTS</a></li>
         
-        <li><a href="/resume/">RESUME</a></li>
+        <li><a href="../resume/">RESUME</a></li>
         
       
       </ul>
@@ -53,23 +53,13 @@
 </nav>
 
       
-      <div class="container">
-        <div class="blog-post">
-          <h3>
-            <strong><a href="/project2/">Project 2</a></strong>
-          </h3>
-        </div>
-        <div class="blog-title">
-          <h4>
-          January 1, 0001
-            &nbsp;&nbsp;
-            
-          </h4>
-        </div>
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <div class="blogpost">
-              
+        <section id="projects">
+  <div class="container">
+    <h3></h3>
+    <div class="panel panel-default">
+      <div class="panel-body">
+       
+
 
 
 <div id="deniz-sevilmis---yds255" class="section level2">
@@ -215,7 +205,7 @@ pairwise.t.test(heart$bp,heart$y, p.adj=&quot;none&quot;)</code></pre>
 <pre class="r"><code>#multivariate normality example (1 of 25 possible)
 ggplot(heart, aes(x = bp, y = maxHR)) +
   geom_point(alpha = .5) + geom_density_2d(h=2) + coord_fixed() + facet_wrap(~y)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" />
+<p><img src="../project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" />
 Due to the academic nature of the study, it is likely that all participants are randomly sampled, and all are independent observations. Each group (y = 1 or 0, or heart disease present/absent) has over 25+ individuals/data points so we can assume multivariate normality of DVs. Just to make sure, I ran a couple of the plots (like the one above, as an example) to make sure they looked normal. We will also assume that covariances are relatively homogenous, and no outliers are evident, so MANOVA can be considered appropriate.</p>
 <p><em>Perform some kind of randomization test on your data (that makes sense). This can be anything you want! State null and alternative hypotheses, perform the test, and interpret the results (7). Create a plot visualizing the null distribution and the test statistic (3).</em></p>
 <pre class="r"><code>#H0: Mean cholesterol is the same between those with heart disease and those without.
@@ -237,7 +227,7 @@ rand_dist[i]&lt;-mean(new[new$heartd== 1,]$chol)-
 
 #interpret
 mean(rand_dist&gt;8.856653 | rand_dist&lt; -8.856653)</code></pre>
-<pre><code>## [1] 0.1354</code></pre>
+<pre><code>## [1] 0.1412</code></pre>
 <pre class="r"><code>t.test(data=heart,chol~heartd)</code></pre>
 <pre><code>## 
 ##  Welch Two Sample t-test
@@ -252,7 +242,7 @@ mean(rand_dist&gt;8.856653 | rand_dist&lt; -8.856653)</code></pre>
 ##        251.0870        242.2303</code></pre>
 <pre class="r"><code>#plot
 {hist(rand_dist,main=&quot;&quot;,ylab=&quot;&quot;); abline(v = c(-8.856653,8.856653),col=&quot;red&quot;)}</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" />
+<p><img src="../project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" />
 The difference in means between the two groups of patients is 8.857 mg/dL. After running the randomization test, we can see that we get a p value of 0.1374 which is NOT lower than 0.05 so the difference in cholesterol is not significant between those with heart disease and those without. Essentially, both those with and without heart disease they have the same mean cholesterol. To make sure, we ran a Welch’s t-test, and the p is slightly smaller (makes sense because parametric) and pretty much matches/confirms our own p statistic.</p>
 <p><em>Build a linear regression model predicting one of your response variables from at least 2 other variables, including their interaction. Mean-center any numeric variables involved in the interaction.</em></p>
 <pre><code>- Interpret the coefficient estimates (do not discuss significance) (10)
@@ -291,7 +281,7 @@ summary(fit)</code></pre>
 <p>According to our model, the predicted age for a person of average BP and average Max HR is 54.4 years old. Controlling for max HR (heart rate) for every 1 mmHg(unit) increase in BP from the mean, we expect to see the predicted age increase 0.138 years from the average age. Controlling for BP, every 1 bpm (unit) increase of the max HR from the mean decreases the predicted age by 0.153 years. The slope for BP_c on age is 0.0018 greater for every 1 unit increase of max HR from the mean. As BP increases each mmHg from the mean BP, the effect of an additional bpm of max HR from the mean on age increases by .0018 years. (All disregarding significance)</p>
 <pre class="r"><code>#plot
 ggplot(heart,aes(y=age,x=bp_c,color=maxHR_c))+geom_point()+stat_smooth(method=&quot;lm&quot;,se=FALSE)</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="../project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#check assumptions
 bptest(fit) #H0 = homoskedastic</code></pre>
 <pre><code>## 
@@ -350,7 +340,7 @@ samp_distn&lt;-replicate(5000, {
 #bootstrap SEs
 samp_distn %&gt;% t %&gt;% as.data.frame %&gt;% summarize_all(sd)</code></pre>
 <pre><code>##   (Intercept)       bp_c    maxHR_c bp_c:maxHR_c
-## 1   0.4651665 0.02484196 0.01976454   0.00114234</code></pre>
+## 1   0.4697532 0.02506566 0.01996577  0.001159792</code></pre>
 <pre class="r"><code>#compare
 coeftest(fit)[,1:2] #original</code></pre>
 <pre><code>##                  Estimate  Std. Error
@@ -448,13 +438,13 @@ heart$logit&lt;-predict(fit,type=&quot;link&quot;) #get predicted logit scores (
 heart%&gt;%ggplot()+geom_density(aes(logit,color=y,fill=y), alpha=.4)+
   theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab(&quot;logit (log-odds)&quot;)+
   geom_rug(aes(logit,color=y))</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="../project2_files/figure-html/unnamed-chunk-9-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>#ROC and AUC
 library(plotROC)
 prob&lt;-predict(fit,type=&quot;response&quot;)
 ROCplot&lt;-ggplot(heart)+geom_roc(aes(d=y,m=prob), n.cuts=0)
 ROCplot</code></pre>
-<p><img src="/project2_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p><img src="../project2_files/figure-html/unnamed-chunk-10-1.png" width="768" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>calc_auc(ROCplot)</code></pre>
 <pre><code>##   PANEL group      AUC
 ## 1     1    -1 0.923935</code></pre>
@@ -551,35 +541,11 @@ diags%&gt;%summarize_all(mean)</code></pre>
 <p>From our LASSO, we can see that being male (sex = 1), any type of chest pain (cp types 1-3, cp 4 is no angina), blood pressure (bp), an EKG with ST wave abnormality (ekg1), max heart rate (maxHR), presence of exercise induced angina (exang1), ST depression following exercise, upsloping or flat slope of peak exercise ST segment (slope 1 &amp; 2), and any number of major vessels colored by fluoroscopy (greater than 0, ves 1-3, ves 4 is not known, so makes sense it doesn’t matter) are the most predictive variables. All of the discussed variables are retained, the rest with “.” are dropped. These are actually exciting results because these variables listed are clinically known to be related to heart disease, and what would be expected to be predictive from a clinical perspective! The AUC is 0.893 which is considered pretty good for predicting presence of heart disease. The accuracy for the LASSO model is 0.855, compared to the model from part 5 which was 0.822, so this model is more accurate.</p>
 </div>
 
-              <hr>
-              <div class="related-posts">
-                <h5>Related Posts</h5>
-                
-              </div>
-            </div>
-          </div>
-          <hr>
-        <div class="disqus">
-  <div id="disqus_thread"></div>
-  <script type="text/javascript">
-
-    (function() {
-      
-      
-      if (window.location.hostname == "localhost")
-        return;
-
-      var disqus_shortname = '';
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-  </script>
-  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-</div>
-        </div>
       </div>
+    </div>
+  </div>
+</section>
+
       
     </div>
 
@@ -598,10 +564,10 @@ diags%&gt;%summarize_all(mean)</code></pre>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script src="/js/docs.min.js"></script>
-<script src="/js/main.js"></script>
+<script src="../js/docs.min.js"></script>
+<script src="../js/main.js"></script>
 
-<script src="/js/ie10-viewport-bug-workaround.js"></script>
+<script src="../js/ie10-viewport-bug-workaround.js"></script>
 
 
     

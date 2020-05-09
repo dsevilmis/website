@@ -1,0 +1,52 @@
+---
+title: R & Parseltongue...I mean, Python
+author: Deniz Sevilmis
+date: '2020-05-08'
+slug: r-python
+categories: []
+tags: []
+description: ''
+---
+Everyone knows the only way to truly learn something is to relate it back to Harry Potter. Okay, maybe that's not true- but it definitely helps. You all remember Parseltongue, right? Harry (& Voldemort!) used Parseltongue to speak to pythons, so maybe we can use Python to speak Parseltongue? I imagine it would go something like this.
+
+![](/blog/2020-05-08-r-python_files/harrypy.jpg)
+
+So I tried that with the snake in my backyard- didn't work. But you CAN use another language with Python - R! Turns out they can talk to each other, no snakes involed (much safer).
+
+For example, say you wanted to cast a cute friendship spell as such:
+```{R}
+library(reticulate)
+Voldemort<-"Avada"
+```
+
+```{python}
+says="Kedavra!"
+print(r.Voldemort,says)
+```
+
+So easy! I always thought Python was too hard to learn (maybe it's easier for Slytherins?) but knowing I can still use R gives me the safety net I need while I'm still learning.
+
+Now we're going to use this dataset from Dan Martin containing a list of every Harry Potter character. Say we wanted to do something ridiculous like find all the people whose name starts with an H and ends with an R. Let's use both R and Python to do it!
+
+```{R}
+HP<-read.csv("https://raw.githubusercontent.com/dpmartin42/Networks/master/Harry%20Potter/data/HP_links.csv")
+head(HP)
+#tidy!
+library(tidyverse)
+HP<-HP%>%select(Label)%>%rename(name=Label)
+string <- paste(HP$name, collapse = " , ")
+```
+
+```{python}
+import re
+names=re.findall(r'H[a-zA-Z]+\s[a-zA-Z]+r[^a-z]',r.string)
+print(names)
+```
+
+There you have it! A totally practical and super realistic application of using both R and Python in RStudio. Now, with so many options you MAY be feeling a little like this guy:
+
+![](/blog/2020-05-08-r-python_files/rpy2.png)
+
+But no fear! At least we all can agree...
+
+![](/blog/2020-05-08-r-python_files/rpy.jpg)
