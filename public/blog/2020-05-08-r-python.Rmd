@@ -29,15 +29,17 @@ So easy! I always thought Python was too hard to learn (maybe it's easier for Sl
 Now we're going to use this dataset from Dan Martin containing a list of every Harry Potter character. Say we wanted to do something ridiculous like find all the people whose name starts with an H and ends with an R. Let's use both R and Python to do it!
 
 ```{R}
+#R
 HP<-read.csv("https://raw.githubusercontent.com/dpmartin42/Networks/master/Harry%20Potter/data/HP_links.csv")
 head(HP)
-#tidy!
+
 library(tidyverse)
 HP<-HP%>%select(Label)%>%rename(name=Label)
 string <- paste(HP$name, collapse = " , ")
 ```
 
 ```{python}
+#python
 import re
 names=re.findall(r'H[a-zA-Z]+\s[a-zA-Z]+r[^a-z]',r.string)
 print(names)

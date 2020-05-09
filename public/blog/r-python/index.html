@@ -83,7 +83,8 @@ print(r.Voldemort,says)</code></pre>
 <pre><code>## Avada Kedavra!</code></pre>
 <p>So easy! I always thought Python was too hard to learn (maybe it’s easier for Slytherins?) but knowing I can still use R gives me the safety net I need while I’m still learning.</p>
 <p>Now we’re going to use this dataset from Dan Martin containing a list of every Harry Potter character. Say we wanted to do something ridiculous like find all the people whose name starts with an H and ends with an R. Let’s use both R and Python to do it!</p>
-<pre class="r"><code>HP&lt;-read.csv(&quot;https://raw.githubusercontent.com/dpmartin42/Networks/master/Harry%20Potter/data/HP_links.csv&quot;)
+<pre class="r"><code>#R
+HP&lt;-read.csv(&quot;https://raw.githubusercontent.com/dpmartin42/Networks/master/Harry%20Potter/data/HP_links.csv&quot;)
 head(HP)</code></pre>
 <pre><code>##              Label             link
 ## 1    Hannah Abbott    Hannah_Abbott
@@ -92,8 +93,7 @@ head(HP)</code></pre>
 ## 4       Katie Bell       Katie_Bell
 ## 5   Cuthbert Binns   Cuthbert_Binns
 ## 6    Regulus Black    Regulus_Black</code></pre>
-<pre class="r"><code>#tidy!
-library(tidyverse)</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ────────────────────────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.0     ✓ purrr   0.3.4
 ## ✓ tibble  3.0.1     ✓ dplyr   0.8.5
@@ -104,7 +104,8 @@ library(tidyverse)</code></pre>
 ## x dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>HP&lt;-HP%&gt;%select(Label)%&gt;%rename(name=Label)
 string &lt;- paste(HP$name, collapse = &quot; , &quot;)</code></pre>
-<pre class="python"><code>import re
+<pre class="python"><code>#python
+import re
 names=re.findall(r&#39;H[a-zA-Z]+\s[a-zA-Z]+r[^a-z]&#39;,r.string)
 print(names)</code></pre>
 <pre><code>## [&#39;Hermione Granger &#39;, &#39;Harry Potter &#39;]</code></pre>
