@@ -36,7 +36,11 @@ theme = "hugo-sustain"
   identifier = "projects"
   weight = 200
   url = "/projects/"
-
+[[menu.main]]
+  name = "about"
+  identifier = "about"
+  weight = 300
+  url = "/about/"
 
 
 

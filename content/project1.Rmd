@@ -13,13 +13,13 @@ knitr::opts_chunk$set(echo = TRUE, eval = TRUE, fig.align = "center", warning = 
 tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 ```
 
-###Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
+### Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
 For my project, I have selected FiveThirtyEight's 'bechel' dataset and the 'movies' dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes' websites. The 'bechdel' df can be pulled up by downloading/calling the FiveThirtyEight package and the 'movies' dataset can be found here: http://www2.stat.duke.edu/~mc301/data/movies.html. 
 
-####movies
+#### movies
 The 'movies' dataset is a dataframe that contains 651 randomly sampled movies released between 1972 and 2014 in the US and their IMDB and Rotten Tomatoes data. The variables include title, genre, runtime, year (released), director, imdb_id, studio, and mpaa rating(g, pg, pg-13, etc.), which are all pretty self explanatory. It also includes audience_score and critics_score (% positive ratings on Rotten Tomatoes) and the critics_rating (on the "Tomatometer", which is either 'Fresh' or 'Rotten' or 'Certified Fresh'). Fresh being positive critic ratings greater than 60%, Rotten being less than 60% positive critic reviews, and Certified Fresh is a special distinction for the very best rated movies. The audience_score is quite similar but it's represented by a popcorn bucket, and upright means 60%+ positive reviews, and below is spilled. (thtr/dvd)_rel_(year/month/day) is the individual day, month, year it was released in theaters. The best_(pic/actor/actress/director)_(win/nom) refers to Oscars nominations and wins for best picture, director, actor, actress. The only caveat, these nominations and wins are not necessarily for that movie (except best picture), but for one of the main 5 actors or the director in their overall career. Actor1 through actor5 variables are just the main 5 lead actors featured in the movie. Top200_box is whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo.
 
-####bechdel
+#### bechdel
 The 'bechdel' dataset contains 1794 rows (movies) and 15 variables. **The bechdel test is a measure of how well women are represented in a film. A movie passes the Bechdel test if there are (1) two named women in it, (2) who talk to each other, (3) about something besides a man.** This is a standard for bare minimum of depth for female characters in a film. Year, title, imdb (ID) and budget are pretty self explanatory. The binary variable is just whether is passes or fails the test; test is the bechdel result with 'ok' if pass, or the reason why it didn't pass, and if it says '-disagree' there has been debate about whether that factor could be debated. The clean_test variable is the same as test but doesn't include these discrepancies. Domgross and intgross are domestic and international gross in US dollars and the same variables with "_2013" at the end are just inflation-adjusted. The variables code, decade_code, and period_code are irrelevant and will be dropped.
 
 The data should be interesting to explore and see if the depth of female representation and interaction in movies has a positive or negative effect on the approval of critics, the public, or the profitability of the movie. I hope to find some kind of correlational evidence of movies that pass the Bechdel test performing better in the box office and ratings overall, disproving the belief that having females play a large role in films will hurt the profitability or approval, or possibly seeing which studios or genres are more likely to produce movies that pass the Bechdel test.
@@ -39,7 +39,7 @@ glimpse(bechdel)
 glimpse(movies)
 ```
 
-##Tidying and Joining
+## Tidying and Joining
 ```{R}
 #get imdb ID's
 imdb<-gsub("http://www.imdb.com/title/", "", movies$imdb_url)
@@ -124,7 +124,7 @@ bech1<- bech1%>%mutate(binary2 = if_else(binary == "PASS", TRUE, FALSE))
 ```
 Made century var to indicate if made before or after 2000, changed the factor variables to binary in order to easier compute summary statistics using mean() and sum() to get count and proportion.
 
-##Summary Statistics
+## Summary Statistics
 ```{R}
 #the very top rated movies and whether or not they passed
 sum1 <- bech1%>%select(title, audience_rating, critics_rating, top200_box, binary)%>%filter(audience_rating == "Upright", critics_rating == "Certified Fresh", top200_box == TRUE)
@@ -165,7 +165,7 @@ bech_cor <- bech1 %>% select_if(is.numeric) %>% select(-thtr_rel_year, -imdb_num
 bech_cor
 ```
 
-##Visualisations
+## Visualisations
 
 ```{R}
 #cor heatmap
@@ -214,7 +214,7 @@ bech1%>%ggplot()+geom_boxplot(aes(x=mpaa_rating, y=imdb_rating, fill=binary))+
 We can see that there is no significant difference in IMDB ratings across films that pass or fail the Bechdel test, and across MPAA ratings. It is interesting to note here, that there are no rated G movies that pass the Bechdel test. If we use MPAA rating as a proxy for target audience, it is interesting to see there are no real kids movies that truly represent women, which also suggests a lack of depth in role models for young girls- this is something that could be explored further.
 
 
-##Running Principal Component Analysis
+## Running Principal Component Analysis
 ```{R}
 #select all numeric variables and scale them
 bech_nums <- bech1 %>% select_if(is.numeric) %>% scale()

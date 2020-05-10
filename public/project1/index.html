@@ -44,6 +44,8 @@
         
         <li><a href="../projects/">PROJECTS</a></li>
         
+        <li><a href="../about/">ABOUT</a></li>
+        
       
       </ul>
     </div>
@@ -61,12 +63,16 @@
 <script src="../rmarkdown-libs/kePrint/kePrint.js"></script>
 
 
-<p>###Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.
-For my project, I have selected FiveThirtyEight’s ‘bechel’ dataset and the ‘movies’ dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes’ websites. The ‘bechdel’ df can be pulled up by downloading/calling the FiveThirtyEight package and the ‘movies’ dataset can be found here: <a href="http://www2.stat.duke.edu/~mc301/data/movies.html" class="uri">http://www2.stat.duke.edu/~mc301/data/movies.html</a>.</p>
-<p>####movies
-The ‘movies’ dataset is a dataframe that contains 651 randomly sampled movies released between 1972 and 2014 in the US and their IMDB and Rotten Tomatoes data. The variables include title, genre, runtime, year (released), director, imdb_id, studio, and mpaa rating(g, pg, pg-13, etc.), which are all pretty self explanatory. It also includes audience_score and critics_score (% positive ratings on Rotten Tomatoes) and the critics_rating (on the “Tomatometer”, which is either ‘Fresh’ or ‘Rotten’ or ‘Certified Fresh’). Fresh being positive critic ratings greater than 60%, Rotten being less than 60% positive critic reviews, and Certified Fresh is a special distinction for the very best rated movies. The audience_score is quite similar but it’s represented by a popcorn bucket, and upright means 60%+ positive reviews, and below is spilled. (thtr/dvd)<em>rel</em>(year/month/day) is the individual day, month, year it was released in theaters. The best_(pic/actor/actress/director)_(win/nom) refers to Oscars nominations and wins for best picture, director, actor, actress. The only caveat, these nominations and wins are not necessarily for that movie (except best picture), but for one of the main 5 actors or the director in their overall career. Actor1 through actor5 variables are just the main 5 lead actors featured in the movie. Top200_box is whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo.</p>
-<p>####bechdel
-The ‘bechdel’ dataset contains 1794 rows (movies) and 15 variables. <strong>The bechdel test is a measure of how well women are represented in a film. A movie passes the Bechdel test if there are (1) two named women in it, (2) who talk to each other, (3) about something besides a man.</strong> This is a standard for bare minimum of depth for female characters in a film. Year, title, imdb (ID) and budget are pretty self explanatory. The binary variable is just whether is passes or fails the test; test is the bechdel result with ‘ok’ if pass, or the reason why it didn’t pass, and if it says ‘-disagree’ there has been debate about whether that factor could be debated. The clean_test variable is the same as test but doesn’t include these discrepancies. Domgross and intgross are domestic and international gross in US dollars and the same variables with &quot;_2013&quot; at the end are just inflation-adjusted. The variables code, decade_code, and period_code are irrelevant and will be dropped.</p>
+<div id="write-a-narrative-introductory-paragraph-or-two-describing-the-datasets-you-have-chosen-the-variables-they-contain-how-they-were-acquired-and-why-they-are-interesting-to-you.-expand-on-potential-associations-you-may-expect-if-any." class="section level3">
+<h3>Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any.</h3>
+<p>For my project, I have selected FiveThirtyEight’s ‘bechel’ dataset and the ‘movies’ dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes’ websites. The ‘bechdel’ df can be pulled up by downloading/calling the FiveThirtyEight package and the ‘movies’ dataset can be found here: <a href="http://www2.stat.duke.edu/~mc301/data/movies.html" class="uri">http://www2.stat.duke.edu/~mc301/data/movies.html</a>.</p>
+<div id="movies" class="section level4">
+<h4>movies</h4>
+<p>The ‘movies’ dataset is a dataframe that contains 651 randomly sampled movies released between 1972 and 2014 in the US and their IMDB and Rotten Tomatoes data. The variables include title, genre, runtime, year (released), director, imdb_id, studio, and mpaa rating(g, pg, pg-13, etc.), which are all pretty self explanatory. It also includes audience_score and critics_score (% positive ratings on Rotten Tomatoes) and the critics_rating (on the “Tomatometer”, which is either ‘Fresh’ or ‘Rotten’ or ‘Certified Fresh’). Fresh being positive critic ratings greater than 60%, Rotten being less than 60% positive critic reviews, and Certified Fresh is a special distinction for the very best rated movies. The audience_score is quite similar but it’s represented by a popcorn bucket, and upright means 60%+ positive reviews, and below is spilled. (thtr/dvd)<em>rel</em>(year/month/day) is the individual day, month, year it was released in theaters. The best_(pic/actor/actress/director)_(win/nom) refers to Oscars nominations and wins for best picture, director, actor, actress. The only caveat, these nominations and wins are not necessarily for that movie (except best picture), but for one of the main 5 actors or the director in their overall career. Actor1 through actor5 variables are just the main 5 lead actors featured in the movie. Top200_box is whether or not the movie is in the Top 200 Box Office list on BoxOfficeMojo.</p>
+</div>
+<div id="bechdel" class="section level4">
+<h4>bechdel</h4>
+<p>The ‘bechdel’ dataset contains 1794 rows (movies) and 15 variables. <strong>The bechdel test is a measure of how well women are represented in a film. A movie passes the Bechdel test if there are (1) two named women in it, (2) who talk to each other, (3) about something besides a man.</strong> This is a standard for bare minimum of depth for female characters in a film. Year, title, imdb (ID) and budget are pretty self explanatory. The binary variable is just whether is passes or fails the test; test is the bechdel result with ‘ok’ if pass, or the reason why it didn’t pass, and if it says ‘-disagree’ there has been debate about whether that factor could be debated. The clean_test variable is the same as test but doesn’t include these discrepancies. Domgross and intgross are domestic and international gross in US dollars and the same variables with &quot;_2013&quot; at the end are just inflation-adjusted. The variables code, decade_code, and period_code are irrelevant and will be dropped.</p>
 <p>The data should be interesting to explore and see if the depth of female representation and interaction in movies has a positive or negative effect on the approval of critics, the public, or the profitability of the movie. I hope to find some kind of correlational evidence of movies that pass the Bechdel test performing better in the box office and ratings overall, disproving the belief that having females play a large role in films will hurt the profitability or approval, or possibly seeing which studios or genres are more likely to produce movies that pass the Bechdel test.</p>
 <pre class="r"><code>#Loading packages and datasets
 library(fivethirtyeight)
@@ -131,7 +137,10 @@ glimpse(bechdel)</code></pre>
 ## $ actor5           &lt;chr&gt; &quot;Joseph Julian Soria&quot;, &quot;Genevieve Mooy&quot;, &quot;Bob Balaba…
 ## $ imdb_url         &lt;chr&gt; &quot;http://www.imdb.com/title/tt1869425/&quot;, &quot;http://www.…
 ## $ rt_url           &lt;chr&gt; &quot;//www.rottentomatoes.com/m/filly_brown_2012/&quot;, &quot;//w…</code></pre>
-<p>##Tidying and Joining</p>
+</div>
+</div>
+<div id="tidying-and-joining" class="section level2">
+<h2>Tidying and Joining</h2>
 <pre class="r"><code>#get imdb ID&#39;s
 imdb&lt;-gsub(&quot;http://www.imdb.com/title/&quot;, &quot;&quot;, movies$imdb_url)
 imdb&lt;-gsub(&quot;/&quot;, &quot;&quot;, imdb)
@@ -235,7 +244,9 @@ bech1&lt;- bech1%&gt;%mutate(best_pic_nom = if_else(best_pic_nom == &quot;yes&qu
                top200_box = if_else(top200_box == &quot;yes&quot;, TRUE, FALSE))
 bech1&lt;- bech1%&gt;%mutate(binary2 = if_else(binary == &quot;PASS&quot;, TRUE, FALSE))</code></pre>
 <p>Made century var to indicate if made before or after 2000, changed the factor variables to binary in order to easier compute summary statistics using mean() and sum() to get count and proportion.</p>
-<p>##Summary Statistics</p>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary Statistics</h2>
 <pre class="r"><code>#the very top rated movies and whether or not they passed
 sum1 &lt;- bech1%&gt;%select(title, audience_rating, critics_rating, top200_box, binary)%&gt;%filter(audience_rating == &quot;Upright&quot;, critics_rating == &quot;Certified Fresh&quot;, top200_box == TRUE)
 sum1%&gt;%kable()%&gt;%kable_styling(bootstrap_options = &quot;striped&quot;, full_width = F)</code></pre>
@@ -855,7 +866,9 @@ bech_cor</code></pre>
 ## critics_score    0.7555322     1.0000000     0.71788639  0.2394272
 ## audience_score   0.9036895     0.7178864     1.00000000  0.2215078
 ## ROI              0.1878592     0.2394272     0.22150783  1.0000000</code></pre>
-<p>##Visualisations</p>
+</div>
+<div id="visualisations" class="section level2">
+<h2>Visualisations</h2>
 <pre class="r"><code>#cor heatmap
 library(ggcorrplot)
 ggcorrplot(bech_cor, colors = c(&quot;steelblue1&quot;, &quot;white&quot;, &quot;deeppink&quot;))+labs(title = &quot;Bechdel Movie Data Correlations&quot;)</code></pre>
@@ -894,7 +907,9 @@ bech1%&gt;%ggplot()+geom_boxplot(aes(x=mpaa_rating, y=imdb_rating, fill=binary))
   theme(legend.position = &quot;none&quot;, plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))</code></pre>
 <p><img src="../project1_files/figure-html/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" />
 We can see that there is no significant difference in IMDB ratings across films that pass or fail the Bechdel test, and across MPAA ratings. It is interesting to note here, that there are no rated G movies that pass the Bechdel test. If we use MPAA rating as a proxy for target audience, it is interesting to see there are no real kids movies that truly represent women, which also suggests a lack of depth in role models for young girls- this is something that could be explored further.</p>
-<p>##Running Principal Component Analysis</p>
+</div>
+<div id="running-principal-component-analysis" class="section level2">
+<h2>Running Principal Component Analysis</h2>
 <pre class="r"><code>#select all numeric variables and scale them
 bech_nums &lt;- bech1 %&gt;% select_if(is.numeric) %&gt;% scale()
 
@@ -996,6 +1011,7 @@ ggplot() + geom_hline(aes(yintercept=0), lty=2) +
   ggplot(aes(PC1, PC2, color=year)) + geom_point() + coord_fixed()</code></pre>
 <p><img src="../project1_files/figure-html/unnamed-chunk-15-3.png" width="672" style="display: block; margin: auto;" />
 From our findings, we can see that theater release year and year is the greatest negatively correlated from the rest of the variables, but extremely correlated with each other (nearly 1). Audience score, critic score, and IMDB rating are all so correlated they are nearly synonymous. We can also see the budget and ratings are not very correlated at all, probably because most movies have similar budgets but very widely varying opinion on the movie. In addition, domestic and international gross are both very correlated. Overall, there aren’t very clear principle components to our data, and it is difficult to distinguish them into distinct groups as seen on our ggplot, because most of the points are clustered into one group even across the 2 major principal components.</p>
+</div>
 
       </div>
     </div>

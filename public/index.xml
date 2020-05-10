@@ -6,10 +6,22 @@
     <description>Recent content on Deniz&#39;s Portfolio</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Sun, 02 Oct 2016 22:55:05 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 10 May 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>About Me</title>
+      <link>/about/</link>
+      <pubDate>Sun, 10 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Yasemin Deniz Sevilmis   deniz@sevilmis.net  dsevilmis@utexas.edu  github.com/dsevilmis Feel free to contact me via email.   Skills  Can swim a 50m free in 26 seconds.
+ Has a 10 step-skincare routine, please inquire.
+ Proud winner of my 4th and 5th grade spelling bees, as well as State Finalist in Medical Spelling in 2017.
+   Education University of Texas at Austin B.S.A. in Biology | 2020</description>
+    </item>
     
     <item>
       <title>R &amp; Parseltongue...I mean, Python</title>
@@ -39,7 +51,7 @@ So I tried that with the snake in my backyard- didn’t work. But you CAN use an
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/project1/</guid>
-      <description>###Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any. For my project, I have selected FiveThirtyEight’s ‘bechel’ dataset and the ‘movies’ dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes’ websites. The ‘bechdel’ df can be pulled up by downloading/calling the FiveThirtyEight package and the ‘movies’ dataset can be found here: http://www2.</description>
+      <description>Write a narrative introductory paragraph or two describing the datasets you have chosen, the variables they contain, how they were acquired, and why they are interesting to you. Expand on potential associations you may expect, if any. For my project, I have selected FiveThirtyEight’s ‘bechel’ dataset and the ‘movies’ dataset from Mine Çetinkaya-Rundel at Duke University who gathered the data from IMDB and Rotten Tomatoes’ websites. The ‘bechdel’ df can be pulled up by downloading/calling the FiveThirtyEight package and the ‘movies’ dataset can be found here: http://www2.</description>
     </item>
     
     <item>
